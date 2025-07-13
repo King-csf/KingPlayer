@@ -1,0 +1,23 @@
+# ninja log v6
+18	368	7741244479684277	KingPlayer_autogen/mocs_compilation.cpp	6c7b6053e1ef1328
+445	2079	7741244483948949	CMakeFiles/KingPlayer.dir/player.cpp.obj	65bad5d765df0363
+18	368	7741244479684277	D:/QtProject/KingPlayer/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KingPlayer_autogen/timestamp	6c7b6053e1ef1328
+18	368	7741244479684277	KingPlayer_autogen/timestamp	6c7b6053e1ef1328
+1369	3518	7741225455717154	CMakeFiles/KingPlayer.dir/KingPlayer_autogen/mocs_compilation.cpp.obj	b89372276fc728f8
+18	368	7741244479684277	D:/QtProject/KingPlayer/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KingPlayer_autogen/mocs_compilation.cpp	6c7b6053e1ef1328
+2851	3248	7741244508010652	KingPlayer.exe	2b968b980ee343ee
+1438	3576	7741225456395814	CMakeFiles/KingPlayer.dir/main.cpp.obj	a58d1b1a763cf9e2
+369	2851	7741244483193866	CMakeFiles/KingPlayer.dir/mainwindow.cpp.obj	7a9d90523c91503
+11	1425	7740048740008958	build.ninja	3b7c8acf51813b44
+274	528	7740036506922810	KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp	b007261ccf2323b1
+274	528	7740036506922810	D:/QtProject/KingPlayer/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp	b007261ccf2323b1
+576	843	7740036507982790	CMakeFiles/KingPlayer.dir/KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp.obj	45a9a76f5e5be858
+1696	2564	7741169465498162	CMakeFiles/KingPlayer.dir/packetqueue.cpp.obj	992f9fe72090a089
+328	1121	7741169698437387	CMakeFiles/KingPlayer.dir/framequeue.cpp.obj	e010f9aa7bcc830e
+17	371	7741254626140514	KingPlayer_autogen/timestamp	6c7b6053e1ef1328
+17	371	7741254626140514	KingPlayer_autogen/mocs_compilation.cpp	6c7b6053e1ef1328
+17	371	7741254626140514	D:/QtProject/KingPlayer/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KingPlayer_autogen/timestamp	6c7b6053e1ef1328
+17	371	7741254626140514	D:/QtProject/KingPlayer/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KingPlayer_autogen/mocs_compilation.cpp	6c7b6053e1ef1328
+442	2129	7741254630381218	CMakeFiles/KingPlayer.dir/player.cpp.obj	65bad5d765df0363
+372	2849	7741254629683970	CMakeFiles/KingPlayer.dir/mainwindow.cpp.obj	7a9d90523c91503
+2849	3256	7741254654461190	KingPlayer.exe	2b968b980ee343ee

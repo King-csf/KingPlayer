@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>image/last.png</file>
+        <file>image/next.png</file>
+        <file>image/播放.png</file>
+        <file>image/播放器.svg</file>
+        <file>image/列表.png</file>
+        <file>image/素材.png</file>
+        <file>image/暂停.png</file>
+        <file>image/列表形式.png</file>
+        <file>image/音量.png</file>
+        <file>image/正方形.png</file>
+    </qresource>
+</RCC>
