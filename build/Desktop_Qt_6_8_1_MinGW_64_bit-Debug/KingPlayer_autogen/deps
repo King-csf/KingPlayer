@@ -715,6 +715,9 @@ KingPlayer_autogen/timestamp: \
 	D:/QtProject/KingPlayer/ffmpeg/include/libavutil/rational.h \
 	D:/QtProject/KingPlayer/ffmpeg/include/libavutil/samplefmt.h \
 	D:/QtProject/KingPlayer/ffmpeg/include/libavutil/version.h \
+	D:/QtProject/KingPlayer/ffmpeg/include/libswresample/swresample.h \
+	D:/QtProject/KingPlayer/ffmpeg/include/libswresample/version.h \
+	D:/QtProject/KingPlayer/ffmpeg/include/libswresample/version_major.h \
 	D:/QtProject/KingPlayer/ffmpeg/include/libswscale/swscale.h \
 	D:/QtProject/KingPlayer/ffmpeg/include/libswscale/version.h \
 	D:/QtProject/KingPlayer/ffmpeg/include/libswscale/version_major.h \

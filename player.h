@@ -16,6 +16,7 @@ extern "C"
 #include "libavutil/error.h"
 #include "libavfilter/avfilter.h"
 #include "libswscale/swscale.h"
+#include "libswresample/swresample.h"
 }
 
 

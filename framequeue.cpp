@@ -13,6 +13,7 @@ void FrameQueue::cleanQueue()
     while(!frameQueue.empty())
     {
         av_frame_unref(frameQueue.front());
+        av_frame_free(&frameQueue.front());
         frameQueue.pop();
     }
 

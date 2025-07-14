@@ -155,6 +155,8 @@ int Player::videoDeocode()
     //              << QString(errBuf);
     // }
 
+    isViDecode = true;
+
     int count = 0;
     while(true)
     {
@@ -178,10 +180,10 @@ int Player::videoDeocode()
         count++;
         if(count % 500 == 0)
         {
-            qDebug() << getpid() << " 解码视频：" << count << "帧";
+            qDebug() << " 解码视频：" << count << "帧";
         }
 
-
+        qDebug() << getpid() << " 解码视频：" << count << "帧";
         while((ret = avcodec_receive_frame(viCodeCtx,frame)) == 0)
         {
             //av_frame_make_writable(dstFrame);
@@ -191,7 +193,7 @@ int Player::videoDeocode()
             //qDebug() << getpid() << " 解码视频：" << ++count << "帧";
             videoFrame.pushFrame(frame);
             //videoFrame.pushFrame(dstFrame);
-            //av_frame_unref(frame);
+
         }
         if(ret < 0 && ret != AVERROR_EOF && ret != AVERROR(EAGAIN))
         {
@@ -202,20 +204,20 @@ int Player::videoDeocode()
     }
 
     avcodec_send_packet(viCodeCtx,NULL);
-    while((ret = avcodec_receive_frame(viCodeCtx,frame)) == 0)
+    while(avcodec_receive_frame(viCodeCtx,frame) == 0)
     {
-        qDebug() << getpid() << " 解码视频：" << ++count << "帧";
+        qDebug()  << " 解码视频：" << ++count << "帧";
         // sws_scale(sws, frame->data, frame->linesize, 0, frame->height,
         //           dstFrame->data, dstFrame->linesize);
         // videoFrame.pushFrame(dstFrame);
         videoFrame.pushFrame(frame);
-        //av_frame_unref(frame);
+
     }
 
     qDebug() << "视频解码完成";
     av_frame_free(&frame);
     //sws_freeContext(sws);
-    //avcodec_free_context(&viCodeCtx);
+
     return 0;
 }
 
@@ -248,10 +250,27 @@ int Player::audioDecode()
     AVPacket pkt;
     //av_init_packet(&pkt);
     AVFrame * frame = av_frame_alloc();
+    frame->format = inCtx->streams[aIdx]->codecpar->format;
+    frame->ch_layout = auCodeCtx->ch_layout;
+    frame->nb_samples = 1024;
     av_frame_get_buffer(frame,0);
+
+    // AVFrame * outFrame = av_frame_alloc();
+    // outFrame->format = ;
+    // outFrame->ch_layout = viCodeCtx->ch_layout;
+    // outFrame->nb_samples = 1024;
+    // av_frame_get_buffer(outFrame,0);
+
+    // SwrContext *swr_ctx = NULL;
+
+    // swr_alloc_set_opts2(&swr_ctx,&outFrame->ch_layout,AV_SAMPLE_FMT_FLTP,
+    //                     viCodeCtx->sample_rate,&viCodeCtx->ch_layout,(int)frame->format,
+    //                     viCodeCtx->sample_rate,0,NULL);
 
     int count = 0;
 
+
+    isAuDecode = true;
     while(true)
     {
         //qDebug() << "isStop :" << isStop;
@@ -288,6 +307,7 @@ int Player::audioDecode()
         {
             //qDebug() << getpid() << " 解码音频：" << ++count << "帧";
             audioFrame.pushFrame(frame);
+
         }
         if(ret < 0 && ret != AVERROR_EOF && ret != AVERROR(EAGAIN))
         {
@@ -302,19 +322,27 @@ int Player::audioDecode()
     {
         qDebug() << getpid() << " 解码音频：" << ++count << "帧";
         audioFrame.pushFrame(frame);
+
     }
     qDebug() << "音频解码完成";
     av_frame_free(&frame);
-    avcodec_free_context(&auCodeCtx);
+
     return 0;
 }
 
 void Player::delayVideo()
 {
 
-    while(!isDemuxer && !isStop)
+    while ((!isDemuxer || !isViDecode) && !isStop)
     {
         SDL_Delay(5);
+    }
+
+    // 跳出循环后，必须检查是不是因为 isStop 才跳出的
+    if (isStop)
+    {
+        qDebug() << "delayVideo thread stopped before init.";
+        return; // 如果是，必须立刻返回，不能执行后面的代码
     }
 
     qDebug() << "run delayVideo";
@@ -354,12 +382,13 @@ void Player::delayVideo()
         SDL_Delay(25);
     }
     av_frame_free(&frame);
-    SDL_DestroyTexture(texture);
 }
 
 void Player::playAudio()
 {
     SDL_AudioSpec *spec;
+    spec->channels = inCtx->streams[aIdx]->codecpar->ch_layout.nb_channels;
+    //spec->format = ;
 }
 
 void Player::destory()
