@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <atomic>
 #include <chrono>
+#include "tool.h"
 extern "C"
 {
 #include "SDL3/SDL.h"
@@ -25,6 +26,8 @@ class Player
 public:
     Player();
     ~Player();
+
+    Tool tool;
     //播放的文件
     QString filename;
 
@@ -49,6 +52,8 @@ public:
     bool isAuDecode;
     bool isViDecode;
 
+    double totalTime;
+
     //音频解码
     //const AVCodec * auCodec;
     AVCodecContext *auCodeCtx;
@@ -60,7 +65,8 @@ public:
         THREAD_DEMUXER = 0,
         THREAD_AUDIO_DECODE,
         THREAD_VIDEO_DECODE,
-        THREAD_DELAY_VIDEO
+        THREAD_DELAY_VIDEO,
+        THREAD_PLAY_AUDIO
     };
 
     //获取单例
@@ -75,6 +81,8 @@ public:
     void playAudio();
     void destory();
 
+    double audioClock;
+    double videoClock;
 };
 
 #endif // PLAYER_H

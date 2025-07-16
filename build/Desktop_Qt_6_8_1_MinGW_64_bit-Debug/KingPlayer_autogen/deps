@@ -731,5 +731,7 @@ KingPlayer_autogen/timestamp: \
 	D:/QtProject/KingPlayer/packetqueue.h \
 	D:/QtProject/KingPlayer/player.cpp \
 	D:/QtProject/KingPlayer/player.h \
+	D:/QtProject/KingPlayer/tool.cpp \
+	D:/QtProject/KingPlayer/tool.h \
 	D:/QtProject/KingPlayer/mainwindow.ui \
 	D:/Qt/Tools/CMake_64/bin/cmake.exe

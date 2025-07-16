@@ -12,6 +12,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->SDL_Widget->setAttribute(Qt::WA_DontCreateNativeAncestors);
 
     player = Player::getInstance();
+
+    //初始化定时器
+    timer = new QTimer(this);
+    timer->start(1000);
+    curSec = 0;
     // 延迟执行，确保 Qt 完成创建
     //QTimer::singleShot(0, this, &MainWindow::setSDLWindow);
 }
@@ -109,7 +114,41 @@ void MainWindow::on_toolButton_clicked()
     viDecoderThread = std::thread(&player->threadFun,Player::THREAD_VIDEO_DECODE);
     auDecoderThread = std::thread(&player->threadFun,Player::THREAD_AUDIO_DECODE);
     delayVideoThread = std::thread(&player->threadFun,Player::THREAD_DELAY_VIDEO);
+    playAudioThread = std::thread(&player->threadFun,Player::THREAD_PLAY_AUDIO);
     //viDeocderThread.detach();
+    initProgressBar();
+
+    //ui->total_time->setText()
+}
+
+void MainWindow::initProgressBar()
+{
+    while(!player->isDemuxer);
+
+    curSec = 0;
+
+    totalTime = player->totalTime;
+    int hour = totalTime /3600;
+    int min = (int)totalTime % 3600 / 60;
+    int sec = (int)totalTime % 60;
+
+    qDebug() << "totalTime:" << totalTime
+             << player->totalTime;
+    ui->total_time->setText(QString("%1:%2:%3").arg(hour).arg(min).arg(sec));
+
+    ui->progress_bar->setRange(0,totalTime);
+
+    connect(timer,&QTimer::timeout,this,[&](){
+        curSec += 1;
+        if(curSec <= totalTime)
+        {
+            ui->progress_bar->setValue(curSec);
+            ui->now_time->setText(QString("%1:%2:%3")
+                                      .arg(curSec /3600)
+                                      .arg((int)curSec % 3600 / 60)
+                                      .arg((int)curSec % 60));
+        }
+    });
 }
 
 void MainWindow::stopThread()
@@ -120,10 +159,10 @@ void MainWindow::stopThread()
     player->videoFrame.isStop = true;
     player->audioFrame.isStop = true;
 
-     player->videoPkt.cv.notify_all();
-     player->audioPkt.cv.notify_all();
-     player->videoFrame.cv.notify_all();
-     player->audioFrame.cv.notify_all();
+    player->videoPkt.cv.notify_all();
+    player->audioPkt.cv.notify_all();
+    player->videoFrame.cv.notify_all();
+    player->audioFrame.cv.notify_all();
 
     if(muxerThread.joinable())
     {
@@ -141,10 +180,15 @@ void MainWindow::stopThread()
     {
         delayVideoThread.join();
     }
+    if(playAudioThread.joinable())
+    {
+        playAudioThread.join();
+    }
 
     player->isStop = false;
     player->audioPkt.isStop = false;
     player->videoPkt.isStop = false;
     player->videoFrame.isStop = false;
     player->audioFrame.isStop = false;
+
 }

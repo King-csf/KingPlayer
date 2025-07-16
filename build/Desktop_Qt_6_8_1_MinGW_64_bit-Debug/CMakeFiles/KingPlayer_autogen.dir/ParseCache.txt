@@ -529,6 +529,7 @@ D:/QtProject/KingPlayer/mainwindow.h
  mdp:D:/QtProject/KingPlayer/mainwindow.h
  mdp:D:/QtProject/KingPlayer/packetqueue.h
  mdp:D:/QtProject/KingPlayer/player.h
+ mdp:D:/QtProject/KingPlayer/tool.h
 D:/QtProject/KingPlayer/framequeue.cpp
 D:/QtProject/KingPlayer/mainwindow.cpp
  uic:./ui_mainwindow.h
@@ -537,3 +538,5 @@ D:/QtProject/KingPlayer/framequeue.h
 D:/QtProject/KingPlayer/packetqueue.h
 D:/QtProject/KingPlayer/packetqueue.cpp
 D:/QtProject/KingPlayer/player.cpp
+D:/QtProject/KingPlayer/tool.h
+D:/QtProject/KingPlayer/tool.cpp

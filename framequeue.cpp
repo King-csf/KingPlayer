@@ -3,7 +3,7 @@
 FrameQueue::FrameQueue()
 {
 
-    maxNum = INT_MAX;
+    maxNum = 4096;
 }
 
 void FrameQueue::cleanQueue()

@@ -524,4 +524,5 @@ D:/QtProject/KingPlayer/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KingPlayer_aut
   D:/QtProject/KingPlayer/ffmpeg/include/libswscale/version_major.h \
   D:/QtProject/KingPlayer/framequeue.h \
   D:/QtProject/KingPlayer/packetqueue.h \
-  D:/QtProject/KingPlayer/player.h
+  D:/QtProject/KingPlayer/player.h \
+  D:/QtProject/KingPlayer/tool.h

@@ -7,7 +7,7 @@
 				{
 					"build" : ".",
 					"hasInstallRule" : true,
-					"jsonFile" : "directory-.-Debug-0443dbc286f92c443658.json",
+					"jsonFile" : "directory-.-Debug-6bb77ca6a89e57d41857.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.16"
@@ -44,7 +44,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "KingPlayer::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-KingPlayer-Debug-b79aacf19bedc31b4706.json",
+					"jsonFile" : "target-KingPlayer-Debug-4f0f1f7b413cc1861e4b.json",
 					"name" : "KingPlayer",
 					"projectIndex" : 0
 				},

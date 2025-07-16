@@ -44,7 +44,7 @@ border:3px solid #000000;
        <item>
         <widget class="QLabel" name="now_time">
          <property name="text">
-          <string>00.00.00</string>
+          <string>00:00:00</string>
          </property>
          <property name="textFormat">
           <enum>Qt::TextFormat::MarkdownText</enum>
@@ -52,7 +52,7 @@ border:3px solid #000000;
         </widget>
        </item>
        <item>
-        <widget class="QSlider" name="horizontalSlider">
+        <widget class="QSlider" name="progress_bar">
          <property name="orientation">
           <enum>Qt::Orientation::Horizontal</enum>
          </property>

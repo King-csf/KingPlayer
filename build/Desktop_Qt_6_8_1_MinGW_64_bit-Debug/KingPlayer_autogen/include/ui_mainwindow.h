@@ -35,7 +35,7 @@ public:
     QWidget *widget_2;
     QHBoxLayout *horizontalLayout_2;
     QLabel *now_time;
-    QSlider *horizontalSlider;
+    QSlider *progress_bar;
     QLabel *total_time;
     QWidget *widget;
     QHBoxLayout *horizontalLayout;
@@ -92,11 +92,11 @@ public:
 
         horizontalLayout_2->addWidget(now_time);
 
-        horizontalSlider = new QSlider(widget_2);
-        horizontalSlider->setObjectName("horizontalSlider");
-        horizontalSlider->setOrientation(Qt::Orientation::Horizontal);
+        progress_bar = new QSlider(widget_2);
+        progress_bar->setObjectName("progress_bar");
+        progress_bar->setOrientation(Qt::Orientation::Horizontal);
 
-        horizontalLayout_2->addWidget(horizontalSlider);
+        horizontalLayout_2->addWidget(progress_bar);
 
         total_time = new QLabel(widget_2);
         total_time->setObjectName("total_time");
@@ -228,7 +228,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-        now_time->setText(QCoreApplication::translate("MainWindow", "00.00.00", nullptr));
+        now_time->setText(QCoreApplication::translate("MainWindow", "00:00:00", nullptr));
         total_time->setText(QCoreApplication::translate("MainWindow", "00.00.00", nullptr));
         toolButton->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         toolButton_2->setText(QCoreApplication::translate("MainWindow", "...", nullptr));

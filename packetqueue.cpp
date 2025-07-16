@@ -2,7 +2,7 @@
 
 PacketQueue::PacketQueue()
 {
-    maxNum = INT_MAX;
+    maxNum = 4096;
 }
 
 void PacketQueue::cleanQueue()

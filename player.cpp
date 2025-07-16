@@ -12,6 +12,9 @@ Player::Player()
     isDemuxer = false;
     isAuDecode = false;
     isViDecode = false;
+    audioClock = 0;
+    videoClock = 0;
+    totalTime = 0;
     av_log_set_level(AV_LOG_WARNING);
 
 }
@@ -50,6 +53,10 @@ int Player::demuxer(const QString& filename)
     AVPacket pkt;
     int count = 0;
 
+    //获取视频时长
+    totalTime = inCtx->duration / AV_TIME_BASE;
+    // qDebug() << "totalTime:" << totalTime
+    //          << inCtx->duration;
     isDemuxer = true;
 
     while((ret = av_read_frame(inCtx,&pkt)) == 0)
@@ -100,6 +107,8 @@ void Player::threadFun(threadType flag)
         break;
     case THREAD_DELAY_VIDEO:
         player->delayVideo();
+    case THREAD_PLAY_AUDIO:
+        player->playAudio();
     default:
         break;
     }
@@ -140,7 +149,7 @@ int Player::videoDeocode()
     AVPacket pkt;
     //av_init_packet(&pkt);
     AVFrame * frame = av_frame_alloc();
-    av_frame_get_buffer(frame,1);
+    av_frame_get_buffer(frame,0);
 
     // AVFrame * dstFrame= av_frame_alloc();
     // dstFrame->width = viCodeCtx->width;
@@ -178,12 +187,12 @@ int Player::videoDeocode()
             break;
         }
         count++;
-        if(count % 500 == 0)
+        if(count % 1000 == 0)
         {
-            qDebug() << " 解码视频：" << count << "帧";
+            //qDebug() << " 解码视频：" << count << "帧";
         }
 
-        qDebug() << getpid() << " 解码视频：" << count << "帧";
+        //qDebug() << getpid() << " 解码视频：" << count << "帧";
         while((ret = avcodec_receive_frame(viCodeCtx,frame)) == 0)
         {
             //av_frame_make_writable(dstFrame);
@@ -191,6 +200,7 @@ int Player::videoDeocode()
             // sws_scale(sws, frame->data, frame->linesize, 0, frame->height,
             //          dstFrame->data, dstFrame->linesize);
             //qDebug() << getpid() << " 解码视频：" << ++count << "帧";
+            //qDebug() << frame->pts;
             videoFrame.pushFrame(frame);
             //videoFrame.pushFrame(dstFrame);
 
@@ -206,10 +216,11 @@ int Player::videoDeocode()
     avcodec_send_packet(viCodeCtx,NULL);
     while(avcodec_receive_frame(viCodeCtx,frame) == 0)
     {
-        qDebug()  << " 解码视频：" << ++count << "帧";
+        //qDebug()  << " 解码视频：" << ++count << "帧";
         // sws_scale(sws, frame->data, frame->linesize, 0, frame->height,
         //           dstFrame->data, dstFrame->linesize);
         // videoFrame.pushFrame(dstFrame);
+        //qDebug() << frame->pts;
         videoFrame.pushFrame(frame);
 
     }
@@ -250,22 +261,26 @@ int Player::audioDecode()
     AVPacket pkt;
     //av_init_packet(&pkt);
     AVFrame * frame = av_frame_alloc();
-    frame->format = inCtx->streams[aIdx]->codecpar->format;
+    frame->format = auCodeCtx->sample_fmt;
     frame->ch_layout = auCodeCtx->ch_layout;
     frame->nb_samples = 1024;
     av_frame_get_buffer(frame,0);
 
-    // AVFrame * outFrame = av_frame_alloc();
-    // outFrame->format = ;
-    // outFrame->ch_layout = viCodeCtx->ch_layout;
-    // outFrame->nb_samples = 1024;
-    // av_frame_get_buffer(outFrame,0);
 
-    // SwrContext *swr_ctx = NULL;
 
-    // swr_alloc_set_opts2(&swr_ctx,&outFrame->ch_layout,AV_SAMPLE_FMT_FLTP,
-    //                     viCodeCtx->sample_rate,&viCodeCtx->ch_layout,(int)frame->format,
-    //                     viCodeCtx->sample_rate,0,NULL);
+    //
+     SwrContext *swrCtx = NULL;
+
+     swr_alloc_set_opts2(&swrCtx,
+                         &auCodeCtx->ch_layout,AV_SAMPLE_FMT_FLT,auCodeCtx->sample_rate,
+                         &auCodeCtx->ch_layout,auCodeCtx->sample_fmt, auCodeCtx->sample_rate,
+                         0,NULL);
+
+     if(swr_init(swrCtx) < 0)
+     {
+         qDebug() << "SwrContext init failed.";
+         return -1;
+     }
 
     int count = 0;
 
@@ -281,7 +296,7 @@ int Player::audioDecode()
         }
 
         //解封装完成，并且队列为空退出循环
-        if(isDemuxer && videoPkt.pktQueue.empty())
+        if(isDemuxer && audioPkt.pktQueue.empty())
         {
             break;
         }
@@ -305,8 +320,26 @@ int Player::audioDecode()
 
         while((ret = avcodec_receive_frame(auCodeCtx,frame)) == 0)
         {
+            AVFrame * outFrame = av_frame_alloc();
+            outFrame->format = AV_SAMPLE_FMT_FLT;
+            outFrame->ch_layout = auCodeCtx->ch_layout;
+            outFrame->nb_samples = 1024;
+            av_frame_get_buffer(outFrame,0);
             //qDebug() << getpid() << " 解码音频：" << ++count << "帧";
-            audioFrame.pushFrame(frame);
+            ret = swr_convert(swrCtx,
+                        &outFrame->data[0],outFrame->nb_samples,
+                        (const uint8_t**)frame->data,frame->nb_samples);
+            //qDebug() << frame->pts << "  "<< outFrame->pts;
+
+            if(ret < 0)
+            {
+                qDebug() << "swr_convert failed.";
+                continue;
+            }
+            outFrame->pts = frame->pts;
+            //qDebug() << outFrame->data[0];
+            audioFrame.pushFrame(outFrame);
+            av_frame_unref(frame);
 
         }
         if(ret < 0 && ret != AVERROR_EOF && ret != AVERROR(EAGAIN))
@@ -316,17 +349,25 @@ int Player::audioDecode()
         }
         av_packet_unref(&pkt);
     }
-    qDebug() << "123";
+
     avcodec_send_packet(auCodeCtx,NULL);
     while((ret = avcodec_receive_frame(auCodeCtx,frame)) == 0)
     {
-        qDebug() << getpid() << " 解码音频：" << ++count << "帧";
-        audioFrame.pushFrame(frame);
-
+        AVFrame * outFrame = av_frame_alloc();
+        outFrame->format = AV_SAMPLE_FMT_FLT;
+        outFrame->ch_layout = auCodeCtx->ch_layout;
+        outFrame->nb_samples = 1024;
+        av_frame_get_buffer(outFrame,0);
+        ret = swr_convert(swrCtx,
+                          outFrame->data,outFrame->nb_samples,
+                          frame->data,frame->nb_samples);
+        //qDebug() << getpid() << " 解码音频：" << ++count << "帧";
+        audioFrame.pushFrame(outFrame);
+        av_frame_unref(frame);
     }
     qDebug() << "音频解码完成";
     av_frame_free(&frame);
-
+    swr_free(&swrCtx);
     return 0;
 }
 
@@ -377,18 +418,108 @@ void Player::delayVideo()
         SDL_RenderClear(render);
         SDL_RenderTexture(render,texture,NULL,NULL);
         SDL_RenderPresent(render);
+
+        double timeBase = av_q2d(inCtx->streams[vIdx]->time_base);
+        double duration = frame->duration * timeBase * 1000;
+        double delay = duration;
+        videoClock = frame->pts * timeBase * 1000;
+        double diff = videoClock-audioClock;
+        //qDebug() <<  ;
+        if(fabs(diff) <= delay)
+        {
+            delay = duration;
+        }
+        else if(diff > duration)
+        {
+            delay *= 2;
+        }
+        else if(diff < -duration)
+        {
+            delay = 0;
+        }
+
         av_frame_unref(frame);
 
-        SDL_Delay(25);
+        SDL_Delay(delay);
     }
     av_frame_free(&frame);
 }
 
 void Player::playAudio()
 {
-    SDL_AudioSpec *spec;
-    spec->channels = inCtx->streams[aIdx]->codecpar->ch_layout.nb_channels;
-    //spec->format = ;
+    while ((!isDemuxer || !isAuDecode) && !isStop)
+    {
+        SDL_Delay(5);
+    }
+
+    if (isStop)
+    {
+        qDebug() << "play thread stopped before init.";
+        return;
+    }
+
+    qDebug() << "run playAudio";
+
+    SDL_AudioSpec wantSpec,haveSpec;
+    SDL_zero(wantSpec);
+    SDL_zero(haveSpec);
+
+    wantSpec.freq     = inCtx->streams[aIdx]->codecpar->sample_rate;
+    wantSpec.format   = tool.ToSDLFormat(AV_SAMPLE_FMT_FLT);  // 32-bit float 示例
+    wantSpec.channels = inCtx->streams[aIdx]->codecpar->ch_layout.nb_channels;
+
+    haveSpec.freq     = inCtx->streams[aIdx]->codecpar->sample_rate;
+    haveSpec.format   = SDL_AUDIO_F32LE;
+    haveSpec.channels = inCtx->streams[aIdx]->codecpar->ch_layout.nb_channels;
+
+
+    SDL_AudioStream* stream = SDL_OpenAudioDeviceStream(
+        SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK,
+        &wantSpec,
+        nullptr,
+        nullptr
+        );
+
+    if(!stream)
+    {
+        qDebug() << "SDL_OpenAudioDeviceStream failed.";
+        return ;
+    }
+
+
+    int count = 0;
+    //开始播放音频
+
+    SDL_ResumeAudioStreamDevice(stream);
+    AVFrame * frame = av_frame_alloc();
+    av_frame_get_buffer(frame,0);
+    int maxSize = 4096;
+
+    while(true)
+    {
+        if(isStop)
+        {
+            break;
+        }
+
+        audioFrame.popFrame(frame);
+        while (SDL_GetAudioStreamQueued(stream) > maxSize * 2)
+        {
+            SDL_Delay(1);
+        }
+        int bytes = frame->nb_samples * wantSpec.channels * sizeof(float);
+
+        audioClock = frame->pts * av_q2d(auCodeCtx->time_base) * 1000;
+        //qDebug() << audioClock;
+        SDL_PutAudioStreamData(stream,frame->data[0],bytes);
+        //qDebug() << "音频播放"<< ++count << "次.";
+
+        av_frame_unref(frame);
+    }
+
+    av_frame_free(&frame);
+    //关闭设备
+    SDL_PauseAudioStreamDevice(stream);
 }
 
 void Player::destory()
@@ -402,6 +533,9 @@ void Player::destory()
     isDemuxer = false;
     isAuDecode = false;
     isViDecode = false;
+    audioClock = 0;
+    videoClock = 0;
+    //totalTime = 0;
     if(viCodeCtx)
     {
         avcodec_free_context(&viCodeCtx);

@@ -43,7 +43,14 @@ private:
     std::thread viDecoderThread;
     std::thread auDecoderThread;
     std::thread delayVideoThread;
+    std::thread playAudioThread;
+
     //回收线程
     void stopThread();
+    //初始化进度条
+    void initProgressBar();
+    QTimer *timer;  //定时器
+    int curSec;     //当前进度条
+    double totalTime; // 总进度
 };
 #endif // MAINWINDOW_H

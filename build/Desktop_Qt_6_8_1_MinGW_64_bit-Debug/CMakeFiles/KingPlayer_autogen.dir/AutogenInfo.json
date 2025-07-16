@@ -319,6 +319,12 @@
 			"MU",
 			"EWIEGA46WW/moc_player.cpp",
 			null
+		],
+		[
+			"D:/QtProject/KingPlayer/tool.h",
+			"MU",
+			"EWIEGA46WW/moc_tool.cpp",
+			null
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
@@ -398,7 +404,8 @@
 		[ "D:/QtProject/KingPlayer/main.cpp", "MU", null ],
 		[ "D:/QtProject/KingPlayer/mainwindow.cpp", "MU", null ],
 		[ "D:/QtProject/KingPlayer/packetqueue.cpp", "MU", null ],
-		[ "D:/QtProject/KingPlayer/player.cpp", "MU", null ]
+		[ "D:/QtProject/KingPlayer/player.cpp", "MU", null ],
+		[ "D:/QtProject/KingPlayer/tool.cpp", "MU", null ]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],
