@@ -253,3 +253,63 @@ void MainWindow::on_speedComboBox_currentIndexChanged(int index)
         qDebug() <<"倍速：" << player->speed ;
 }
 
+
+//进度条跳转
+void MainWindow::on_progress_bar_sliderPressed()
+{
+    int value = ui->progress_bar->value();
+    ui->progress_bar->setValue(value);
+    curSec = value;
+    player->isJump = true;
+    player->jumpSec = value;
+    //qDebug() << "value:" << value;
+}
+
+
+void MainWindow::on_next_btn_clicked()
+{
+    int value = curSec + JUMP_TIME;
+    if(value < 0)
+    {
+        value = 0;
+    }
+    if(value > totalTime)
+    {
+        value = totalTime;
+    }
+    curSec = value;
+    ui->progress_bar->setValue(value);
+    player->isJump = true;
+    player->jumpSec = value;
+}
+
+
+void MainWindow::on_last_btn_clicked()
+{
+    int value = curSec - JUMP_TIME;
+    if(value < 0)
+    {
+        value = 0;
+    }
+    if(value > totalTime)
+    {
+        value = totalTime;
+    }
+    curSec = value;
+    ui->progress_bar->setValue(value);
+    player->isJump = true;
+    player->jumpSec = value;
+}
+
+//暂停
+void MainWindow::on_stop_btn_clicked()
+{
+    player->isPause = true;
+}
+
+//继续
+void MainWindow::on_start_btn_clicked()
+{
+    player->isPause = false;
+}
+

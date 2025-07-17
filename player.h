@@ -88,6 +88,14 @@ public:
     std::atomic<bool> isModSpeed;
     SwrContext *swrCtx;
     AVFrame * speedFrame;
+
+    //是否快进
+    std::atomic<bool> isJump;
+    //跳转到的时间
+    int jumpSec;
+    std::atomic<bool> isJumpAuDecode;
+    std::atomic<bool> isJumpViDecode;
+    std::atomic<bool> isPause;
 };
 
 #endif // PLAYER_H

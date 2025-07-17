@@ -3,7 +3,7 @@
 FrameQueue::FrameQueue()
 {
 
-    maxNum = 100;
+    maxNum = 50;
 }
 
 void FrameQueue::cleanQueue()

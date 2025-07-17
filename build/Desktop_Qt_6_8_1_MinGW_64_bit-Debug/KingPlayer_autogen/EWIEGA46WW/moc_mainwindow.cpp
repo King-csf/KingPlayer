@@ -41,7 +41,12 @@ static constexpr auto qt_meta_stringdata_ZN10MainWindowE = QtMocHelpers::stringD
     "on_toolButton_clicked",
     "",
     "on_speedComboBox_currentIndexChanged",
-    "index"
+    "index",
+    "on_progress_bar_sliderPressed",
+    "on_next_btn_clicked",
+    "on_last_btn_clicked",
+    "on_stop_btn_clicked",
+    "on_start_btn_clicked"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -53,7 +58,7 @@ Q_CONSTINIT static const uint qt_meta_data_ZN10MainWindowE[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-       2,   14, // methods
+       7,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -61,12 +66,22 @@ Q_CONSTINIT static const uint qt_meta_data_ZN10MainWindowE[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,   26,    2, 0x08,    1 /* Private */,
-       3,    1,   27,    2, 0x08,    2 /* Private */,
+       1,    0,   56,    2, 0x08,    1 /* Private */,
+       3,    1,   57,    2, 0x08,    2 /* Private */,
+       5,    0,   60,    2, 0x08,    4 /* Private */,
+       6,    0,   61,    2, 0x08,    5 /* Private */,
+       7,    0,   62,    2, 0x08,    6 /* Private */,
+       8,    0,   63,    2, 0x08,    7 /* Private */,
+       9,    0,   64,    2, 0x08,    8 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,    4,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -84,7 +99,17 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'on_speedComboBox_currentIndexChanged'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<int, std::false_type>
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        // method 'on_progress_bar_sliderPressed'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'on_next_btn_clicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'on_last_btn_clicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'on_stop_btn_clicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'on_start_btn_clicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>
     >,
     nullptr
 } };
@@ -96,6 +121,11 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         switch (_id) {
         case 0: _t->on_toolButton_clicked(); break;
         case 1: _t->on_speedComboBox_currentIndexChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 2: _t->on_progress_bar_sliderPressed(); break;
+        case 3: _t->on_next_btn_clicked(); break;
+        case 4: _t->on_last_btn_clicked(); break;
+        case 5: _t->on_stop_btn_clicked(); break;
+        case 6: _t->on_start_btn_clicked(); break;
         default: ;
         }
     }
@@ -120,14 +150,14 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 2)
+        if (_id < 7)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 2;
+        _id -= 7;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 2)
+        if (_id < 7)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 2;
+        _id -= 7;
     }
     return _id;
 }

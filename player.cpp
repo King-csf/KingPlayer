@@ -15,6 +15,11 @@ Player::Player()
     isAuDecode = false;
     isViDecode = false;
     isModSpeed = false;
+    isJump = false;
+    isJumpAuDecode = false;
+    isJumpViDecode = false;
+    isPause = false;
+    jumpSec = 0;
     audioClock = 0;
     videoClock = 0;
     totalTime = 0;
@@ -62,8 +67,14 @@ int Player::demuxer(const QString& filename)
     //          << inCtx->duration;
     isDemuxer = true;
 
-    while((ret = av_read_frame(inCtx,&pkt)) == 0)
+    while(true)
     {
+        av_read_frame(inCtx,&pkt);
+        if(ret < 0 && ret != AVERROR_EOF)
+        {
+            break;
+        }
+
         if(isStop)
         {
             break;
@@ -84,7 +95,24 @@ int Player::demuxer(const QString& filename)
             return 0;
         }
         //av_packet_unref(&pkt);
+        if(isJump)
+        {
+            ret = av_seek_frame(inCtx,-1,jumpSec * AV_TIME_BASE,AVSEEK_FLAG_BACKWARD);
+            if(ret < 0)
+            {
+                qDebug() << "jump failed.";
+                break;
+            }
+            audioPkt.cleanQueue();
+            videoPkt.cleanQueue();
+            isJump = false;
+            isJumpAuDecode = true;
+            isJumpViDecode = true;
+        }
+        while(isPause);
+
     }
+
 
     qDebug()<< "视频帧数：" << videoPkt.pktQueue.size() << Qt::endl
              <<"音频帧数："<< audioPkt.pktQueue.size();
@@ -232,6 +260,14 @@ int Player::videoDeocode()
             qDebug() << "receive video packet from codec failed.";
             break;
         }
+
+        if(isJumpViDecode)
+        {
+            videoFrame.cleanQueue();
+            avcodec_flush_buffers(viCodeCtx);
+            isJumpViDecode = false;
+        }
+        while(isPause);
 
     }
 
@@ -385,6 +421,13 @@ int Player::audioDecode()
             break;
         }
         av_packet_unref(&pkt);
+        if(isJumpAuDecode)
+        {
+            audioFrame.cleanQueue();
+             avcodec_flush_buffers(auCodeCtx);
+            isJumpAuDecode = false;
+        }
+        while(isPause);
     }
 
     avcodec_send_packet(auCodeCtx,NULL);
@@ -448,6 +491,7 @@ void Player::delayVideo()
 
     while(true)
     {
+        while(isPause);
         if(isStop)
         {
             break;
@@ -562,6 +606,7 @@ void Player::playAudio()
 
     while(true)
     {
+        while(isPause);
         if(isStop)
         {
             break;
@@ -647,6 +692,10 @@ void Player::destory()
     isDemuxer = false;
     isAuDecode = false;
     isViDecode = false;
+    isJump = false;
+    jumpSec = 0;
+    isJumpAuDecode = false;
+    isJumpViDecode = false;
     audioClock = 0;
     videoClock = 0;
     //totalTime = 0;

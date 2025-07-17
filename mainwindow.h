@@ -15,11 +15,14 @@ extern "C"
 #include "SDL3/SDL.h"
 }
 
+#define JUMP_TIME 15
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
+
 
 class MainWindow : public QMainWindow
 {
@@ -35,6 +38,16 @@ private slots:
     void on_toolButton_clicked();
 
     void on_speedComboBox_currentIndexChanged(int index);
+
+    void on_progress_bar_sliderPressed();
+
+    void on_next_btn_clicked();
+
+    void on_last_btn_clicked();
+
+    void on_stop_btn_clicked();
+
+    void on_start_btn_clicked();
 
 private:
     Ui::MainWindow *ui;
