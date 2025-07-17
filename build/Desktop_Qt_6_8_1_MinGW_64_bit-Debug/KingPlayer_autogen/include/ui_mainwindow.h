@@ -42,7 +42,7 @@ public:
     QToolButton *toolButton;
     QToolButton *toolButton_2;
     QSpacerItem *horizontalSpacer;
-    QComboBox *comboBox;
+    QComboBox *speedComboBox;
     QToolButton *last_btn;
     QToolButton *start_btn;
     QToolButton *stop_btn;
@@ -137,16 +137,16 @@ public:
 
         horizontalLayout->addItem(horizontalSpacer);
 
-        comboBox = new QComboBox(widget);
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->setObjectName("comboBox");
+        speedComboBox = new QComboBox(widget);
+        speedComboBox->addItem(QString());
+        speedComboBox->addItem(QString());
+        speedComboBox->addItem(QString());
+        speedComboBox->addItem(QString());
+        speedComboBox->addItem(QString());
+        speedComboBox->addItem(QString());
+        speedComboBox->setObjectName("speedComboBox");
 
-        horizontalLayout->addWidget(comboBox);
+        horizontalLayout->addWidget(speedComboBox);
 
         last_btn = new QToolButton(widget);
         last_btn->setObjectName("last_btn");
@@ -232,12 +232,12 @@ public:
         total_time->setText(QCoreApplication::translate("MainWindow", "00.00.00", nullptr));
         toolButton->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         toolButton_2->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
-        comboBox->setItemText(0, QCoreApplication::translate("MainWindow", "2.0x", nullptr));
-        comboBox->setItemText(1, QCoreApplication::translate("MainWindow", "1.5x", nullptr));
-        comboBox->setItemText(2, QCoreApplication::translate("MainWindow", "1.25x", nullptr));
-        comboBox->setItemText(3, QCoreApplication::translate("MainWindow", "1.0x", nullptr));
-        comboBox->setItemText(4, QCoreApplication::translate("MainWindow", "0.75x", nullptr));
-        comboBox->setItemText(5, QCoreApplication::translate("MainWindow", "0.5x", nullptr));
+        speedComboBox->setItemText(0, QCoreApplication::translate("MainWindow", "2.0x", nullptr));
+        speedComboBox->setItemText(1, QCoreApplication::translate("MainWindow", "1.5x", nullptr));
+        speedComboBox->setItemText(2, QCoreApplication::translate("MainWindow", "1.25x", nullptr));
+        speedComboBox->setItemText(3, QCoreApplication::translate("MainWindow", "1.0x", nullptr));
+        speedComboBox->setItemText(4, QCoreApplication::translate("MainWindow", "0.75x", nullptr));
+        speedComboBox->setItemText(5, QCoreApplication::translate("MainWindow", "0.5x", nullptr));
 
         last_btn->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         start_btn->setText(QCoreApplication::translate("MainWindow", "...", nullptr));

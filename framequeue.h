@@ -3,6 +3,7 @@
 
 #include <queue>
 #include  <mutex>
+#include <QDebug>
 #include <condition_variable>
 extern "C"
 {
@@ -24,8 +25,8 @@ public:
     bool isStop;
     std::condition_variable cv;
 
-    void pushFrame(AVFrame * pkt);
-    bool popFrame(AVFrame * pkt);
+    void pushFrame(AVFrame * frame);
+    AVFrame* popFrame();
     //清理队列
     void cleanQueue();
 };

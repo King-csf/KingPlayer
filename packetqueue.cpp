@@ -22,8 +22,12 @@ void PacketQueue::pushPkt(AVPacket& pkt)
     std::unique_lock<std::mutex> lock(mtx);
 
     cv.wait(lock,[&]{
-        return pktQueue.size() < maxNum;
+        return pktQueue.size() < maxNum || isStop;
     });
+    if(isStop)
+    {
+        return ;
+    }
     AVPacket temp;
     av_packet_move_ref(&temp,&pkt);
     pktQueue.push(temp);
@@ -37,6 +41,10 @@ bool PacketQueue::popPkt(AVPacket& pkt)
     cv.wait(lock,[&]{
         return !pktQueue.empty() || isStop;
     });
+    if(isStop)
+    {
+        return false;
+    }
     //因停止被唤醒，但队列为空退出
     if(pktQueue.empty() && isStop)
     {

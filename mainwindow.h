@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QString>
 #include <thread>
+#include <chrono>
+#include <future>
 #include "player.h"
 extern "C"
 {
@@ -32,6 +34,8 @@ public:
 private slots:
     void on_toolButton_clicked();
 
+    void on_speedComboBox_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
     SDL_Window * sdlWindow ;
@@ -47,10 +51,12 @@ private:
 
     //回收线程
     void stopThread();
+    void startThread();
     //初始化进度条
     void initProgressBar();
     QTimer *timer;  //定时器
     int curSec;     //当前进度条
     double totalTime; // 总进度
+    float speed; //播放速率
 };
 #endif // MAINWINDOW_H

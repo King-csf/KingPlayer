@@ -3,7 +3,7 @@
 FrameQueue::FrameQueue()
 {
 
-    maxNum = 4096;
+    maxNum = 100;
 }
 
 void FrameQueue::cleanQueue()
@@ -12,9 +12,9 @@ void FrameQueue::cleanQueue()
 
     while(!frameQueue.empty())
     {
-        av_frame_unref(frameQueue.front());
-        av_frame_free(&frameQueue.front());
+        AVFrame* frame = frameQueue.front();
         frameQueue.pop();
+        av_frame_free(&frame);
     }
 
 }
@@ -24,28 +24,37 @@ void FrameQueue::pushFrame(AVFrame * frame)
     std::unique_lock<std::mutex> lock(mtx);
 
     cv.wait(lock,[&]{
-        return frameQueue.size() < maxNum;
+        return frameQueue.size() < maxNum || isStop;
     });
-    AVFrame * temp = av_frame_alloc();
-    av_frame_get_buffer(temp,0);
-    av_frame_move_ref(temp,frame);
-    frameQueue.push(temp);
+    if (isStop)
+    {
+        qDebug() << "pushFrame stop";
+        av_frame_free(&frame);
+        return;
+    }
+
+    frameQueue.push(frame);
     cv.notify_one();
 
 }
-bool FrameQueue::popFrame(AVFrame * frame)
+AVFrame* FrameQueue::popFrame()
 {
     std::unique_lock<std::mutex> lock(mtx);
 
     cv.wait(lock,[&]{
         return !frameQueue.empty() || isStop;
     });
+    if(isStop)
+    {
+        qDebug() << "popFrame stop";
+        return NULL;
+    }
     if(isStop && frameQueue.empty())
     {
-        return false;
+        return NULL;
     }
-    av_frame_move_ref(frame,frameQueue.front());
+    AVFrame* frame = frameQueue.front();
     frameQueue.pop();
     cv.notify_one();
-    return true;
+    return frame;
 }

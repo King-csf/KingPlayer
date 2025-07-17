@@ -48,9 +48,9 @@ public:
     //线程是否停止
     std::atomic<bool> isStop;
     //相关操作是否结束
-    bool isDemuxer;
-    bool isAuDecode;
-    bool isViDecode;
+    std::atomic<bool> isDemuxer;
+    std::atomic<bool> isAuDecode;
+    std::atomic<bool> isViDecode;
 
     double totalTime;
 
@@ -83,6 +83,11 @@ public:
 
     double audioClock;
     double videoClock;
+
+    float speed; //倍速
+    std::atomic<bool> isModSpeed;
+    SwrContext *swrCtx;
+    AVFrame * speedFrame;
 };
 
 #endif // PLAYER_H

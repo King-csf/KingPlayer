@@ -17,8 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
     timer = new QTimer(this);
     timer->start(1000);
     curSec = 0;
-    // 延迟执行，确保 Qt 完成创建
-    //QTimer::singleShot(0, this, &MainWindow::setSDLWindow);
+    ui->speedComboBox->setCurrentIndex(3);
+    player->speed = 1;
 }
 
 void MainWindow::showEvent(QShowEvent *event)
@@ -104,25 +104,21 @@ void MainWindow::on_toolButton_clicked()
         qDebug() << "filename is null.";
         return ;
     }
+
+
     stopThread();
     player->destory();
-
     qDebug() << "open file :"<< filename << Qt::endl;
-    player->filename = filename;
-    muxerThread = std::thread(&player->threadFun,Player::THREAD_DEMUXER);
-    //;muxerThread.join();
-    viDecoderThread = std::thread(&player->threadFun,Player::THREAD_VIDEO_DECODE);
-    auDecoderThread = std::thread(&player->threadFun,Player::THREAD_AUDIO_DECODE);
-    delayVideoThread = std::thread(&player->threadFun,Player::THREAD_DELAY_VIDEO);
-    playAudioThread = std::thread(&player->threadFun,Player::THREAD_PLAY_AUDIO);
-    //viDeocderThread.detach();
-    initProgressBar();
 
+    player->filename = filename;
+    qDebug() << "player->filename :"<< player->filename << Qt::endl;
+    startThread();
     //ui->total_time->setText()
 }
 
 void MainWindow::initProgressBar()
 {
+    qDebug() << "run initProgressbar";
     while(!player->isDemuxer);
 
     curSec = 0;
@@ -137,7 +133,9 @@ void MainWindow::initProgressBar()
     ui->total_time->setText(QString("%1:%2:%3").arg(hour).arg(min).arg(sec));
 
     ui->progress_bar->setRange(0,totalTime);
-
+    //取消旧连接
+    disconnect(timer, &QTimer::timeout, this, nullptr);
+    //进度条移动
     connect(timer,&QTimer::timeout,this,[&](){
         curSec += 1;
         if(curSec <= totalTime)
@@ -151,8 +149,10 @@ void MainWindow::initProgressBar()
     });
 }
 
+//停止线程
 void MainWindow::stopThread()
 {
+    qDebug() << "run stopThread";
     player->isStop = true;
     player->audioPkt.isStop = true;
     player->videoPkt.isStop = true;
@@ -166,15 +166,21 @@ void MainWindow::stopThread()
 
     if(muxerThread.joinable())
     {
+
         muxerThread.join();
+        qDebug() << "a";
     }
     if(viDecoderThread.joinable())
     {
+
         viDecoderThread.join();
+        qDebug() << "s";
     }
     if(auDecoderThread.joinable())
     {
+
         auDecoderThread.join();
+        qDebug() << "d";
     }
     if(delayVideoThread.joinable())
     {
@@ -183,7 +189,16 @@ void MainWindow::stopThread()
     if(playAudioThread.joinable())
     {
         playAudioThread.join();
+        qDebug() << "f";
     }
+
+
+
+}
+
+void MainWindow::startThread()
+{
+    qDebug() << "run startThread";
 
     player->isStop = false;
     player->audioPkt.isStop = false;
@@ -191,4 +206,50 @@ void MainWindow::stopThread()
     player->videoFrame.isStop = false;
     player->audioFrame.isStop = false;
 
+
+    muxerThread = std::thread(&player->threadFun,Player::THREAD_DEMUXER);
+    //;muxerThread.join();
+    viDecoderThread = std::thread(&player->threadFun,Player::THREAD_VIDEO_DECODE);
+    auDecoderThread = std::thread(&player->threadFun,Player::THREAD_AUDIO_DECODE);
+    delayVideoThread = std::thread(&player->threadFun,Player::THREAD_DELAY_VIDEO);
+    playAudioThread = std::thread(&player->threadFun,Player::THREAD_PLAY_AUDIO);
+    //viDeocderThread.detach();
+    initProgressBar();
 }
+
+//调整倍速
+void MainWindow::on_speedComboBox_currentIndexChanged(int index)
+{
+    speed = ui->speedComboBox->currentText().toDouble();
+    switch (index)
+    {
+        case 0:
+            player->speed = 2;
+            player->isModSpeed = true;
+            break;
+        case 1:
+            player->speed = 1.5;
+            player->isModSpeed = true;
+            break;
+        case 2:
+            player->speed = 1.25;
+            player->isModSpeed = true;
+            break;
+        case 3:
+            player->speed = 1;
+            player->isModSpeed = true;
+            break;
+        case 4:
+            player->speed = 0.75;
+            player->isModSpeed = true;
+            break;
+        case 5:
+            player->speed  = 0.5;
+            player->isModSpeed = true;
+            break;
+        default:
+            break;
+    }
+        qDebug() <<"倍速：" << player->speed ;
+}
+
