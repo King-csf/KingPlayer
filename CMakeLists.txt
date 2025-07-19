@@ -65,6 +65,7 @@ target_link_libraries(KingPlayer PRIVATE
     avcodec
     avformat
     avutil
+    avfilter
     swresample
     swscale
     SDL3

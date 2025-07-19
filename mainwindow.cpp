@@ -137,7 +137,8 @@ void MainWindow::initProgressBar()
     disconnect(timer, &QTimer::timeout, this, nullptr);
     //进度条移动
     connect(timer,&QTimer::timeout,this,[&](){
-        curSec += 1;
+        curSec += 1* player->speed;
+
         if(curSec <= totalTime)
         {
             ui->progress_bar->setValue(curSec);
@@ -158,6 +159,7 @@ void MainWindow::stopThread()
     player->videoPkt.isStop = true;
     player->videoFrame.isStop = true;
     player->audioFrame.isStop = true;
+    player->isPause = false;
 
     player->videoPkt.cv.notify_all();
     player->audioPkt.cv.notify_all();
@@ -250,7 +252,21 @@ void MainWindow::on_speedComboBox_currentIndexChanged(int index)
         default:
             break;
     }
-        qDebug() <<"倍速：" << player->speed ;
+        //取消旧连接
+        // disconnect(timer, &QTimer::timeout, this, nullptr);
+        // //进度条移动
+        // connect(timer,&QTimer::timeout,this,[&](){
+        //     curSec += 1*speed;
+        //     if(curSec <= totalTime)
+        //     {
+        //         ui->progress_bar->setValue(curSec);
+        //         ui->now_time->setText(QString("%1:%2:%3")
+        //                                   .arg(curSec /3600)
+        //                                   .arg((int)curSec % 3600 / 60)
+        //                                   .arg((int)curSec % 60));
+        //     }
+        // });
+
 }
 
 

@@ -496,6 +496,8 @@ D:/QtProject/KingPlayer/mainwindow.h
  mdp:D:/QtProject/KingPlayer/ffmpeg/include/libavcodec/version.h
  mdp:D:/QtProject/KingPlayer/ffmpeg/include/libavcodec/version_major.h
  mdp:D:/QtProject/KingPlayer/ffmpeg/include/libavfilter/avfilter.h
+ mdp:D:/QtProject/KingPlayer/ffmpeg/include/libavfilter/buffersink.h
+ mdp:D:/QtProject/KingPlayer/ffmpeg/include/libavfilter/buffersrc.h
  mdp:D:/QtProject/KingPlayer/ffmpeg/include/libavfilter/version.h
  mdp:D:/QtProject/KingPlayer/ffmpeg/include/libavfilter/version_major.h
  mdp:D:/QtProject/KingPlayer/ffmpeg/include/libavformat/avformat.h

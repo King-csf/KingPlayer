@@ -16,6 +16,8 @@ extern "C"
 #include "libavutil/avutil.h"
 #include "libavutil/error.h"
 #include "libavfilter/avfilter.h"
+#include "libavfilter/buffersink.h"
+#include "libavfilter/buffersrc.h"
 #include "libswscale/swscale.h"
 #include "libswresample/swresample.h"
 }
@@ -61,6 +63,11 @@ public:
     //const AVCodec * viCodec;
     AVCodecContext *viCodeCtx;
 
+    AVFilterGraph * graph;
+    AVFilterContext * srcBuffer;
+    AVFilterContext * sinkBuffer;
+    AVFilterContext * speedFilter;
+
     enum threadType{
         THREAD_DEMUXER = 0,
         THREAD_AUDIO_DECODE,
@@ -80,6 +87,8 @@ public:
     void delayVideo();
     void playAudio();
     void destory();
+    AVFrame *  useSpeedFilter(AVFrame * frame);
+    bool initSpeedFilter();
 
     double audioClock;
     double videoClock;
