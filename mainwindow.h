@@ -68,7 +68,7 @@ private:
     //初始化进度条
     void initProgressBar();
     QTimer *timer;  //定时器
-    int curSec;     //当前进度条
+    double curSec;     //当前进度条
     double totalTime; // 总进度
     float speed; //播放速率
 };

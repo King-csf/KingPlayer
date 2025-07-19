@@ -10,8 +10,8 @@ Player::Player()
     speedFilter = nullptr;
     srcBuffer = nullptr;
     sinkBuffer = nullptr;
-    //viCodeCtx = nullptr;
-    //auCodeCtx = nullptr;
+    viCodeCtx = nullptr;
+    auCodeCtx = nullptr;
     vIdx = -1;
     aIdx = -1;
     speed = 1;
@@ -19,6 +19,7 @@ Player::Player()
     isAuDecode = false;
     isViDecode = false;
     isModSpeed = false;
+    isJumpInitFilter= false;
     isJump = false;
     isJumpAuDecode = false;
     isJumpViDecode = false;
@@ -107,11 +108,13 @@ int Player::demuxer(const QString& filename)
                 qDebug() << "jump failed.";
                 break;
             }
+
             audioPkt.cleanQueue();
             videoPkt.cleanQueue();
             isJump = false;
             isJumpAuDecode = true;
             isJumpViDecode = true;
+            isJumpInitFilter = true;
         }
         while(isPause);
 
@@ -520,50 +523,31 @@ void Player::delayVideo()
         SDL_RenderPresent(render);
 
         double timeBase = av_q2d(inCtx->streams[vIdx]->time_base);
-        double duration = frame->duration * timeBase * 1000 / speed;
+        double duration = frame->duration * timeBase * 1000;
         double delay = duration;
-        videoClock = frame->pts * timeBase * 1000 / speed;
+        videoClock = frame->pts * timeBase * 1000 ;
         double diff = videoClock-audioClock;
         //qDebug() <<  ;
-        if(speed < 1.0)
+        if(fabs(diff) <= delay)
         {
-            if(fabs(diff) <= duration/speed)
-            {
-                delay = duration / speed;
-            }
-            else if(diff > duration/speed)
-            {
-                delay = duration / speed * 2;
-            }
-            else if(diff < -8000)
-            {
-                delay = 0;
-            }
-            else if(diff < -duration/speed)
-            {
-                delay = duration;
-            }
+            delay = duration;
         }
-        else
+        else if(diff > duration)
         {
-            if(fabs(diff) <= delay)
-            {
-                delay = duration / speed;
-            }
-            else if(diff > duration)
-            {
-                delay *= 2;
-            }
-            else if(diff < -duration)
-            {
-                delay = 0;
-            }
+            delay *= 2;
         }
+        else if(diff < -duration)
+        {
+            delay = 0;
+        }
+
+        av_frame_unref(frame);
+
+        SDL_Delay(delay);
         qDebug() << "Speed:" << speed << "VideoClock:" << videoClock
                  << "AudioClock:" << audioClock << "Diff:" << (videoClock - audioClock)
                  << "Delay:" << delay;
-        av_frame_unref(frame);
-        SDL_Delay(delay);
+
     }
     av_frame_free(&frame);
 }
@@ -633,6 +617,8 @@ void Player::playAudio()
 
     initSpeedFilter();
 
+    AVFrame * endFrame = av_frame_alloc();
+
     while(true)
     {
         while(isPause);
@@ -652,60 +638,111 @@ void Player::playAudio()
 
             // swr_init(swrCtx);
             initSpeedFilter();
-
+            SDL_ClearAudioStream(stream);
+            if (frame)
+            {
+                audioClock = audioFrame.frameQueue.front()->pts * av_q2d(inCtx->streams[aIdx]->time_base) * 1000;
+            }
             isModSpeed = false;
         }
-        speedFrame = av_frame_alloc();
-        speedFrame->format = AV_SAMPLE_FMT_FLT;
-        //speedFrame->sample_rate = auCodeCtx->sample_rate * speed;
-        speedFrame->ch_layout = auCodeCtx->ch_layout;
-        speedFrame->nb_samples = 1024;
-
-        ret = av_frame_get_buffer(speedFrame,0);
-
-        frame = audioFrame.popFrame();
-        if(!frame)
+        if(isJumpInitFilter)
         {
-            break;
+            initSpeedFilter();
+            isJumpInitFilter = false;
         }
-        //qDebug() << "frame->nb_samples: " << frame->nb_samples;
-        ret = swr_convert(swrCtx,
-                    &speedFrame->data[0],speedFrame->nb_samples,
-                    (const uint8_t**)frame->data,frame->nb_samples);
-        if(ret < 0)
+        if((ret = av_buffersink_get_frame(sinkBuffer,endFrame)) >= 0)
         {
-            qDebug() << "swr_convert failed.";
+            while (SDL_GetAudioStreamQueued(stream) > maxSize * 2)
+            {
+                SDL_Delay(1);
+            }
+
+            int bytes = ret * wantSpec.channels * sizeof(float);
+
+            // 每秒播放的字节数
+            audioClock = endFrame->pts * av_q2d(auCodeCtx->time_base) * 1000;
+
+            SDL_PutAudioStreamData(stream,endFrame->data[0],endFrame->linesize[0]);
+
+            av_frame_unref(endFrame);
+        }
+        else
+        {
+            if(ret == AVERROR(EAGAIN))
+            {
+
+                speedFrame = av_frame_alloc();
+                speedFrame->format = AV_SAMPLE_FMT_FLT;
+                //speedFrame->sample_rate = auCodeCtx->sample_rate * speed;
+                av_channel_layout_copy(&speedFrame->ch_layout, &auCodeCtx->ch_layout);
+                speedFrame->sample_rate = auCodeCtx->sample_rate;
+
+                if(!frame)
+                {
+                    qDebug() << "123";
+                }
+                frame = audioFrame.popFrame();
+
+
+                if(frame)
+                {
+                    speedFrame->pts = frame->pts;
+                    speedFrame->nb_samples = 1024;
+                }
+                else
+                {
+                    speedFrame->pts = 0;
+                    speedFrame->nb_samples =0;
+                }
+
+                av_frame_get_buffer(speedFrame,0);
+                //qDebug() << "frame->nb_samples: " << frame->nb_samples;
+                ret = swr_convert(swrCtx,
+                                  &speedFrame->data[0],speedFrame->nb_samples,
+                                  (const uint8_t**)frame->data,frame->nb_samples);
+                if(ret < 0)
+                {
+                    qDebug() << "swr_convert failed.";
+                }
+
+                speedFrame->nb_samples = ret;
+
+                av_buffersrc_add_frame_flags(srcBuffer,speedFrame,AV_BUFFERSRC_FLAG_KEEP_REF);
+
+                av_frame_unref(frame);
+                av_frame_unref(speedFrame);
+            }
+
         }
 
-        speedFrame->pts = frame->pts;
         //qDebug()  << "ret :"<< ret;
 
-        AVFrame * endFrame = useSpeedFilter(speedFrame);
-        if(!endFrame)
-        {
-            av_frame_unref(frame);
-            av_frame_unref(speedFrame);
-            continue;
-        }
+        // if(speed == 1)
+        // {
+        //     while (SDL_GetAudioStreamQueued(stream) > maxSize * 2)
+        //     {
+        //         SDL_Delay(1);
+        //     }
+        //     int bytes = ret * wantSpec.channels * sizeof(float);
 
-        while (SDL_GetAudioStreamQueued(stream) > maxSize * 2)
-        {
-            SDL_Delay(1);
-        }
-        int bytes = ret * wantSpec.channels * sizeof(float);
+        //     // 每秒播放的字节数
+        //     audioClock = speedFrame->pts * av_q2d(auCodeCtx->time_base) * 1000 / speed;
 
-        // 每秒播放的字节数
-        audioClock = endFrame->pts * av_q2d(auCodeCtx->time_base) * 1000 / speed;
-
-        SDL_PutAudioStreamData(stream,endFrame->data[0],endFrame->linesize[0]);
+        //     SDL_PutAudioStreamData(stream,speedFrame->data[0],speedFrame->linesize[0]);
 
 
-        av_frame_unref(frame);
-        av_frame_unref(speedFrame);
+        //     av_frame_unref(frame);
+        //     av_frame_unref(speedFrame);
+
+        // }
+
+
+
     }
 
     av_frame_free(&frame);
     av_frame_free(&speedFrame);
+    av_frame_free(&endFrame);
     //关闭设备
     SDL_PauseAudioStreamDevice(stream);
 }
@@ -713,24 +750,26 @@ void Player::playAudio()
 bool Player::initSpeedFilter()
 {
     int ret = 0;
-
-    if(graph)
-    {
-        avfilter_graph_free(&graph);
-    }
     if(srcBuffer)
     {
         avfilter_free(srcBuffer);
+        srcBuffer = nullptr;
     }
     if(sinkBuffer)
     {
         avfilter_free(sinkBuffer);
+        sinkBuffer = nullptr;
     }
     if(speedFilter)
     {
         avfilter_free(speedFilter);
+        speedFilter = nullptr;
     }
-
+    if(graph)
+    {
+        avfilter_graph_free(&graph);
+        graph = nullptr;
+    }
 
     graph = avfilter_graph_alloc();
     if(!graph)
@@ -741,13 +780,15 @@ bool Player::initSpeedFilter()
     char buf[20];
     av_channel_layout_describe(&auCodeCtx->ch_layout,
                                buf, 20);
+    uint64_t mask = auCodeCtx->ch_layout.u.mask;
+    qDebug() << "mask:"<< mask;
     QString arg1 = QString("time_base=%1/%2"
                           ":sample_rate=%3"
-                          ":sample_fmt=fltp"
-                          ":channel_layout=%4").arg(1).arg(inCtx->streams[aIdx]->codecpar->sample_rate)
+                          ":sample_fmt=flt"
+                          ":channel_layout=0x%4").arg(1).arg(inCtx->streams[aIdx]->time_base.den)
                        .arg(inCtx->streams[aIdx]->codecpar->sample_rate)
-                       .arg(buf);
-
+                       .arg(mask, 0, 16);
+    qDebug() << "arg1:" << arg1;
     ret = avfilter_graph_create_filter(&srcBuffer,avfilter_get_by_name("abuffer"),
                                         "in",arg1.toStdString().c_str(),nullptr,graph);
     if(ret < 0)
@@ -786,11 +827,26 @@ bool Player::initSpeedFilter()
 
 AVFrame * Player::useSpeedFilter(AVFrame * frame)
 {
+    if (frame->format != AV_SAMPLE_FMT_FLT) {
+        qDebug() << "滤镜格式不匹配：预期" << AV_SAMPLE_FMT_FLT << "实际" << frame->format;
+        return nullptr;
+    }
+    if (frame->sample_rate != auCodeCtx->sample_rate) {
+        qDebug() << "采样率不匹配：预期" << auCodeCtx->sample_rate << "实际" << frame->sample_rate;
+        return nullptr;
+    }
+    if (!av_channel_layout_compare(&frame->ch_layout, &auCodeCtx->ch_layout)) {
+        qDebug() << "声道布局不匹配";
+
+        return nullptr;
+    }
     int ret = 0;
     ret = av_buffersrc_add_frame_flags(srcBuffer,frame,AV_BUFFERSRC_FLAG_KEEP_REF);
     if(ret < 0)
     {
-        qDebug() << "failed to add frame to buffersrc.";
+        char errbuf[128];
+        av_strerror(ret, errbuf, sizeof(errbuf));
+        qDebug() << "failed to add frame to buffersrc: " << errbuf;
         return nullptr;
     }
     AVFrame * resFrame = av_frame_alloc();
@@ -799,7 +855,7 @@ AVFrame * Player::useSpeedFilter(AVFrame * frame)
     while(true)
     {
         ret = av_buffersink_get_frame_flags(sinkBuffer,resFrame,AV_BUFFERSRC_FLAG_KEEP_REF);
-        if(ret < 0)
+        if(ret < 0 && ret != AVERROR(EAGAIN))
         {
             break;
         }
@@ -813,35 +869,42 @@ void Player::destory()
 
     if(viCodeCtx)
     {
+        qDebug() << "***********";
         avcodec_free_context(&viCodeCtx);
         viCodeCtx = nullptr;
     }
+    qDebug() << "del viCodeCtx";
     if(auCodeCtx)
     {
         avcodec_free_context(&auCodeCtx);
         auCodeCtx = nullptr;
     }
+    qDebug() << "del auCodeCtx";
     if(inCtx)
     {
         avformat_close_input(&inCtx);
     }
+    qDebug() << "del inCtx";
     if(srcBuffer)
     {
         avfilter_free(srcBuffer);
     }
+    qDebug() << "del srcBuffer";;
     if(sinkBuffer)
     {
         avfilter_free(sinkBuffer);
     }
+    qDebug() << "del sinkBuffer";
     if(speedFilter)
     {
         avfilter_free(speedFilter);
     }
+    qDebug() << "del speedFilter";
     if(graph)
     {
         avfilter_graph_free(&graph);
     }
-
+    qDebug() << "del graph";
     vIdx = -1;
     aIdx = -1;
     isDemuxer = false;
@@ -860,10 +923,12 @@ void Player::destory()
         SDL_DestroyTexture(texture);
         texture = nullptr;
     }
+    qDebug() << "del texture";
     if(swrCtx)
     {
         swr_free(&swrCtx);
     }
+    qDebug() << "del swrCtx";
     audioPkt.cleanQueue();
     videoPkt.cleanQueue();
     audioFrame.cleanQueue();

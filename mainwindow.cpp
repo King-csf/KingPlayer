@@ -143,7 +143,7 @@ void MainWindow::initProgressBar()
         {
             ui->progress_bar->setValue(curSec);
             ui->now_time->setText(QString("%1:%2:%3")
-                                      .arg(curSec /3600)
+                                      .arg((int)curSec /3600)
                                       .arg((int)curSec % 3600 / 60)
                                       .arg((int)curSec % 60));
         }

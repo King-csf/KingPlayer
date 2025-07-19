@@ -105,6 +105,7 @@ public:
     std::atomic<bool> isJumpAuDecode;
     std::atomic<bool> isJumpViDecode;
     std::atomic<bool> isPause;
+    std::atomic<bool> isJumpInitFilter;
 };
 
 #endif // PLAYER_H
