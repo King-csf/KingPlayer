@@ -92,6 +92,7 @@ public:
 
     double audioClock;
     double videoClock;
+    double currentAudioPts; // 当前音频帧的PTS，用于正确计算音频时钟
 
     float speed; //倍速
     std::atomic<bool> isModSpeed;

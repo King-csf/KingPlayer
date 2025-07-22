@@ -165,6 +165,11 @@ int Player::videoDeocode()
         SDL_Delay(5);
     }
 
+    if(vIdx == -1)
+    {
+        return 0;
+    }
+
     int ret = 0;
     qDebug() << "run videoDecode";
     const AVCodec * codec = avcodec_find_decoder(inCtx->streams[vIdx]->codecpar->codec_id);
@@ -224,10 +229,8 @@ int Player::videoDeocode()
         }
 
 
-        if(!videoPkt.popPkt(pkt))
-        {
-            break;
-        }
+        videoPkt.popPkt(pkt);
+
         ret = avcodec_send_packet(viCodeCtx,&pkt);
         av_packet_unref(&pkt);
         if(ret < 0)
@@ -311,6 +314,11 @@ int Player::audioDecode()
         SDL_Delay(5);
     }
 
+    if(aIdx == -1)
+    {
+        return 0;
+    }
+
     int ret = 0;
     qDebug() << "run audioDecode";
     const AVCodec * codec = avcodec_find_decoder(inCtx->streams[aIdx]->codecpar->codec_id);
@@ -369,21 +377,16 @@ int Player::audioDecode()
             break;
         }
 
-        //解封装完成，并且队列为空退出循环
-        if(isDemuxer && audioPkt.pktQueue.empty())
-        {
-            break;
-        }
+        //一直让音频解码线程循环
 
-        if(!audioPkt.popPkt(pkt))
-        {
-            break;
-        }
+        audioPkt.popPkt(pkt);
         ret = avcodec_send_packet(auCodeCtx,&pkt);
         if(ret < 0)
         {
             qDebug() << "send audio packet to codec failed.";
-            break;
+            av_packet_unref(&pkt);
+            continue;
+            //break;
         }
         count++;
         if(count % 500 == 0)
@@ -480,6 +483,11 @@ void Player::delayVideo()
         return; // 如果是，必须立刻返回，不能执行后面的代码
     }
 
+    if(vIdx == -1)
+    {
+        return ;
+    }
+
     qDebug() << "run delayVideo";
 
     texture = SDL_CreateTexture(render,
@@ -524,13 +532,15 @@ void Player::delayVideo()
 
         double timeBase = av_q2d(inCtx->streams[vIdx]->time_base);
         double duration = frame->duration * timeBase * 1000;
-        double delay = duration;
-        videoClock = frame->pts * timeBase * 1000 ;
+        // 根据播放速度调整帧间延迟
+        double delay = duration / speed;
+        // 视频时钟计算，保持原始时间轴
+        videoClock = frame->pts * timeBase * 1000;
         double diff = videoClock-audioClock;
         //qDebug() <<  ;
         if(fabs(diff) <= delay)
         {
-            delay = duration;
+            delay = duration / speed;
         }
         else if(diff > duration)
         {
@@ -566,6 +576,11 @@ void Player::playAudio()
         return;
     }
 
+    if(aIdx == -1)
+    {
+        return;
+    }
+
     qDebug() << "run playAudio";
 
     SDL_AudioSpec wantSpec;
@@ -593,8 +608,8 @@ void Player::playAudio()
     //开始播放音频
 
     SDL_ResumeAudioStreamDevice(stream);
-    AVFrame * frame = av_frame_alloc();
-    av_frame_get_buffer(frame,0);
+    AVFrame * frame = nullptr;
+
     int maxSize = 4096;
 
     swr_alloc_set_opts2(&swrCtx,
@@ -618,6 +633,7 @@ void Player::playAudio()
     initSpeedFilter();
 
     AVFrame * endFrame = av_frame_alloc();
+    speedFrame = av_frame_alloc();
 
     while(true)
     {
@@ -630,18 +646,22 @@ void Player::playAudio()
         //倍速改变
         if(isModSpeed)
         {
-            // swr_free(&swrCtx);
-            // swr_alloc_set_opts2(&swrCtx,
-            //                     &auCodeCtx->ch_layout,AV_SAMPLE_FMT_FLT,auCodeCtx->sample_rate / speed,
-            //                     &auCodeCtx->ch_layout,auCodeCtx->sample_fmt, auCodeCtx->sample_rate,
-            //                     0,NULL);
-
-            // swr_init(swrCtx);
+           //重置过滤器
             initSpeedFilter();
             SDL_ClearAudioStream(stream);
-            if (frame)
+            if (!audioFrame.frameQueue.empty())
             {
-                audioClock = audioFrame.frameQueue.front()->pts * av_q2d(inCtx->streams[aIdx]->time_base) * 1000;
+                // 倍速改变时重置音频时钟，需要与视频时钟保持一致
+                double basePts = audioFrame.frameQueue.front()->pts * av_q2d(inCtx->streams[aIdx]->time_base) * 1000;
+                audioClock = basePts;
+                // 同时重置currentAudioPts
+                currentAudioPts = audioFrame.frameQueue.front()->pts;
+            }
+            else
+            {
+                // 如果音频队列为空，使用视频时钟作为参考
+                audioClock = videoClock;
+                currentAudioPts = 0;
             }
             isModSpeed = false;
         }
@@ -660,7 +680,11 @@ void Player::playAudio()
             int bytes = ret * wantSpec.channels * sizeof(float);
 
             // 每秒播放的字节数
-            audioClock = endFrame->pts * av_q2d(auCodeCtx->time_base) * 1000;
+            // 使用输入帧的PTS计算音频时钟，避免atempo滤镜对PTS的影响
+            if(currentAudioPts > 0)
+            {
+                audioClock = currentAudioPts * av_q2d(inCtx->streams[aIdx]->time_base) * 1000;
+            }
 
             SDL_PutAudioStreamData(stream,endFrame->data[0],endFrame->linesize[0]);
 
@@ -671,16 +695,12 @@ void Player::playAudio()
             if(ret == AVERROR(EAGAIN))
             {
 
-                speedFrame = av_frame_alloc();
+
                 speedFrame->format = AV_SAMPLE_FMT_FLT;
                 //speedFrame->sample_rate = auCodeCtx->sample_rate * speed;
                 av_channel_layout_copy(&speedFrame->ch_layout, &auCodeCtx->ch_layout);
                 speedFrame->sample_rate = auCodeCtx->sample_rate;
 
-                if(!frame)
-                {
-                    qDebug() << "123";
-                }
                 frame = audioFrame.popFrame();
 
 
@@ -688,11 +708,14 @@ void Player::playAudio()
                 {
                     speedFrame->pts = frame->pts;
                     speedFrame->nb_samples = 1024;
+                    // 保存当前输入帧的PTS用于时钟计算
+                    currentAudioPts = frame->pts;
                 }
                 else
                 {
                     speedFrame->pts = 0;
                     speedFrame->nb_samples =0;
+                    currentAudioPts = 0;
                 }
 
                 av_frame_get_buffer(speedFrame,0);
@@ -709,32 +732,11 @@ void Player::playAudio()
 
                 av_buffersrc_add_frame_flags(srcBuffer,speedFrame,AV_BUFFERSRC_FLAG_KEEP_REF);
 
-                av_frame_unref(frame);
+                av_frame_free(&frame);
                 av_frame_unref(speedFrame);
             }
 
         }
-
-        //qDebug()  << "ret :"<< ret;
-
-        // if(speed == 1)
-        // {
-        //     while (SDL_GetAudioStreamQueued(stream) > maxSize * 2)
-        //     {
-        //         SDL_Delay(1);
-        //     }
-        //     int bytes = ret * wantSpec.channels * sizeof(float);
-
-        //     // 每秒播放的字节数
-        //     audioClock = speedFrame->pts * av_q2d(auCodeCtx->time_base) * 1000 / speed;
-
-        //     SDL_PutAudioStreamData(stream,speedFrame->data[0],speedFrame->linesize[0]);
-
-
-        //     av_frame_unref(frame);
-        //     av_frame_unref(speedFrame);
-
-        // }
 
 
 
