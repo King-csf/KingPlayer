@@ -98,6 +98,7 @@ public:
     std::atomic<bool> isModSpeed;
     SwrContext *swrCtx;
     AVFrame * speedFrame;
+    SDL_AudioStream * stream; // SDL音频流
 
     //是否快进
     std::atomic<bool> isJump;

@@ -321,11 +321,24 @@ void MainWindow::on_last_btn_clicked()
 void MainWindow::on_stop_btn_clicked()
 {
     player->isPause = true;
+    disconnect(timer, &QTimer::timeout, this, nullptr);
 }
 
 //继续
 void MainWindow::on_start_btn_clicked()
 {
     player->isPause = false;
+    connect(timer,&QTimer::timeout,this,[&](){
+        curSec += 1* player->speed;
+
+        if(curSec <= totalTime)
+        {
+            ui->progress_bar->setValue(curSec);
+            ui->now_time->setText(QString("%1:%2:%3")
+                                      .arg((int)curSec /3600)
+                                      .arg((int)curSec % 3600 / 60)
+                                      .arg((int)curSec % 60));
+        }
+    });
 }
 

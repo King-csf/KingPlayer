@@ -27,6 +27,8 @@ Player::Player()
     jumpSec = 0;
     audioClock = 0;
     videoClock = 0;
+    currentAudioPts = 0;
+    stream = nullptr;
     totalTime = 0;
     av_log_set_level(AV_LOG_WARNING);
 
@@ -72,7 +74,7 @@ int Player::demuxer(const QString& filename)
     //          << inCtx->duration;
     isDemuxer = true;
 
-    while(true)
+    while(!isStop)
     {
         av_read_frame(inCtx,&pkt);
         if(ret < 0 && ret != AVERROR_EOF)
@@ -221,7 +223,7 @@ int Player::videoDeocode()
     isViDecode = true;
 
     int count = 0;
-    while(true)
+    while(!isStop)
     {
         if(isStop)
         {
@@ -229,7 +231,10 @@ int Player::videoDeocode()
         }
 
 
-        videoPkt.popPkt(pkt);
+        if(!videoPkt.popPkt(pkt) && isStop)
+        {
+            break;
+        }
 
         ret = avcodec_send_packet(viCodeCtx,&pkt);
         av_packet_unref(&pkt);
@@ -353,24 +358,24 @@ int Player::audioDecode()
 
 
     //
-     SwrContext *swrCtx = NULL;
+     // SwrContext *swrCtx = NULL;
 
-     swr_alloc_set_opts2(&swrCtx,
-                         &auCodeCtx->ch_layout,AV_SAMPLE_FMT_FLT,auCodeCtx->sample_rate,
-                         &auCodeCtx->ch_layout,auCodeCtx->sample_fmt, auCodeCtx->sample_rate,
-                         0,NULL);
+     // swr_alloc_set_opts2(&swrCtx,
+     //                     &auCodeCtx->ch_layout,AV_SAMPLE_FMT_FLT,auCodeCtx->sample_rate,
+     //                     &auCodeCtx->ch_layout,auCodeCtx->sample_fmt, auCodeCtx->sample_rate,
+     //                     0,NULL);
 
-     if(swr_init(swrCtx) < 0)
-     {
-         qDebug() << "SwrContext init failed.";
-         return -1;
-     }
+     // if(swr_init(swrCtx) < 0)
+     // {
+     //     qDebug() << "SwrContext init failed.";
+     //     return -1;
+     // }
 
     int count = 0;
 
 
     isAuDecode = true;
-    while(true)
+    while(!isStop)
     {
         if(isStop)
         {
@@ -379,7 +384,10 @@ int Player::audioDecode()
 
         //一直让音频解码线程循环
 
-        audioPkt.popPkt(pkt);
+        if(!audioPkt.popPkt(pkt) && isStop)
+        {
+            break;
+        }
         ret = avcodec_send_packet(auCodeCtx,&pkt);
         if(ret < 0)
         {
@@ -464,7 +472,7 @@ int Player::audioDecode()
     }
     qDebug() << "音频解码完成";
     av_frame_free(&frame);
-    swr_free(&swrCtx);
+
     return 0;
 }
 
@@ -504,7 +512,7 @@ void Player::delayVideo()
     av_frame_get_buffer(frame,0);
 
 
-    while(true)
+    while(!isStop)
     {
         while(isPause);
         if(isStop)
@@ -590,7 +598,7 @@ void Player::playAudio()
     wantSpec.format   = tool.ToSDLFormat(AV_SAMPLE_FMT_FLT);  // 32-bit float 示例
     wantSpec.channels = inCtx->streams[aIdx]->codecpar->ch_layout.nb_channels;
 
-    SDL_AudioStream* stream = SDL_OpenAudioDeviceStream(
+    stream = SDL_OpenAudioDeviceStream(
         SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK,
         &wantSpec,
         nullptr,
@@ -635,7 +643,7 @@ void Player::playAudio()
     AVFrame * endFrame = av_frame_alloc();
     speedFrame = av_frame_alloc();
 
-    while(true)
+    while(!isStop)
     {
         while(isPause);
         if(isStop)
@@ -746,7 +754,13 @@ void Player::playAudio()
     av_frame_free(&speedFrame);
     av_frame_free(&endFrame);
     //关闭设备
-    SDL_PauseAudioStreamDevice(stream);
+    if(stream)
+    {
+        SDL_PauseAudioStreamDevice(stream);
+        SDL_DestroyAudioStream(stream);
+        stream = nullptr;
+    }
+
 }
 
 bool Player::initSpeedFilter()
@@ -890,21 +904,25 @@ void Player::destory()
     if(srcBuffer)
     {
         avfilter_free(srcBuffer);
+        srcBuffer = nullptr;
     }
-    qDebug() << "del srcBuffer";;
+    qDebug() << "del srcBuffer";
     if(sinkBuffer)
     {
         avfilter_free(sinkBuffer);
+        sinkBuffer = nullptr;
     }
     qDebug() << "del sinkBuffer";
     if(speedFilter)
     {
         avfilter_free(speedFilter);
+        speedFilter = nullptr;
     }
     qDebug() << "del speedFilter";
     if(graph)
     {
         avfilter_graph_free(&graph);
+        graph = nullptr;
     }
     qDebug() << "del graph";
     vIdx = -1;
@@ -918,6 +936,10 @@ void Player::destory()
     isJumpViDecode = false;
     audioClock = 0;
     videoClock = 0;
+    currentAudioPts = 0;
+    isModSpeed = false;
+    isPause = false;
+    isJumpInitFilter = false;
     //totalTime = 0;
 
     if(texture)
@@ -929,8 +951,15 @@ void Player::destory()
     if(swrCtx)
     {
         swr_free(&swrCtx);
+        swrCtx = nullptr;
     }
     qDebug() << "del swrCtx";
+    if(stream)
+    {
+        SDL_DestroyAudioStream(stream);
+        stream = nullptr;
+    }
+    qDebug() << "del stream";
     audioPkt.cleanQueue();
     videoPkt.cleanQueue();
     audioFrame.cleanQueue();
