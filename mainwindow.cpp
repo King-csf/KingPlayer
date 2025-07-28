@@ -357,3 +357,30 @@ void MainWindow::on_sound_bar_sliderPressed()
     player->volume.store((float)curVolume/volume);
 }
 
+
+void MainWindow::on_toolButton_4_clicked()
+{
+    QString url;
+    rtmpWidget rw;
+    if (rw.exec() == QDialog::Accepted) {
+         url = rw.getUrl();
+    }
+
+    qDebug() << "url:" << url;
+
+    if(url.isNull() || url == "")
+    {
+        qDebug() << "url is null.";
+        return;
+    }
+
+
+    stopThread();
+    player->destory();
+    qDebug() << "open file :"<< filename << Qt::endl;
+
+    player->filename = url;
+    qDebug() << "player->filename :"<< player->filename << Qt::endl;
+    startThread();
+}
+

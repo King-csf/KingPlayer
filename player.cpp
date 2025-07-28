@@ -42,12 +42,17 @@ Player::~Player()
 
 int Player::demuxer(const QString& filename)
 {
+
     qDebug() << "run demux";
+    avformat_network_init();
     int ret;
     //打开输入
+    qDebug() << "url:" << filename;
     ret = avformat_open_input(&inCtx,filename.toStdString().c_str(),NULL,NULL);
     if(ret < 0)
     {
+        isStop = true;
+        isDemuxer = true;
         char  errBuf[128];
         av_strerror(ret,errBuf,128);
         av_log(NULL,AV_LOG_ERROR,"input open failed:%s.\n",errBuf);
@@ -128,6 +133,9 @@ int Player::demuxer(const QString& filename)
 
     qDebug()<< "视频帧数：" << videoPkt.pktQueue.size() << Qt::endl
              <<"音频帧数："<< audioPkt.pktQueue.size();
+
+    avformat_network_deinit();
+
     return 0;
 
 }
@@ -168,6 +176,10 @@ int Player::videoDeocode()
     while(!isDemuxer && !isStop)
     {
         SDL_Delay(5);
+    }
+    if(isStop)
+    {
+        return -1;
     }
 
     if(vIdx == -1)
@@ -320,6 +332,10 @@ int Player::audioDecode()
     while(!isDemuxer && !isStop)
     {
         SDL_Delay(5);
+    }
+    if(isStop)
+    {
+        return -1;
     }
 
     if(aIdx == -1)

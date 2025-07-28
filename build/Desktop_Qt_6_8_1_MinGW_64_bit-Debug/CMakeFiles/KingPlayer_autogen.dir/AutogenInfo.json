@@ -321,6 +321,12 @@
 			null
 		],
 		[
+			"D:/QtProject/KingPlayer/rtmpwidget.h",
+			"MU",
+			"EWIEGA46WW/moc_rtmpwidget.cpp",
+			null
+		],
+		[
 			"D:/QtProject/KingPlayer/tool.h",
 			"MU",
 			"EWIEGA46WW/moc_tool.cpp",
@@ -405,6 +411,7 @@
 		[ "D:/QtProject/KingPlayer/mainwindow.cpp", "MU", null ],
 		[ "D:/QtProject/KingPlayer/packetqueue.cpp", "MU", null ],
 		[ "D:/QtProject/KingPlayer/player.cpp", "MU", null ],
+		[ "D:/QtProject/KingPlayer/rtmpwidget.cpp", "MU", null ],
 		[ "D:/QtProject/KingPlayer/tool.cpp", "MU", null ]
 	],
 	"UIC_OPTIONS" : [],

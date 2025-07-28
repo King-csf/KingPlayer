@@ -9,6 +9,7 @@
 #include <thread>
 #include <chrono>
 #include <future>
+#include "rtmpwidget.h"
 #include "player.h"
 extern "C"
 {
@@ -51,6 +52,8 @@ private slots:
     void on_start_btn_clicked();
 
     void on_sound_bar_sliderPressed();
+
+    void on_toolButton_4_clicked();
 
 private:
     Ui::MainWindow *ui;

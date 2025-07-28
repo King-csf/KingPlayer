@@ -160,8 +160,10 @@ KingPlayer_autogen/timestamp: \
 	D:/Qt/6.8.1/mingw_64/include/QtGui/qtransform.h \
 	D:/Qt/6.8.1/mingw_64/include/QtGui/qwindowdefs.h \
 	D:/Qt/6.8.1/mingw_64/include/QtGui/qwindowdefs_win.h \
+	D:/Qt/6.8.1/mingw_64/include/QtWidgets/QDialog \
 	D:/Qt/6.8.1/mingw_64/include/QtWidgets/QFileDialog \
 	D:/Qt/6.8.1/mingw_64/include/QtWidgets/QMainWindow \
+	D:/Qt/6.8.1/mingw_64/include/QtWidgets/QWidget \
 	D:/Qt/6.8.1/mingw_64/include/QtWidgets/qdialog.h \
 	D:/Qt/6.8.1/mingw_64/include/QtWidgets/qfiledialog.h \
 	D:/Qt/6.8.1/mingw_64/include/QtWidgets/qmainwindow.h \
@@ -735,7 +737,10 @@ KingPlayer_autogen/timestamp: \
 	D:/QtProject/KingPlayer/packetqueue.h \
 	D:/QtProject/KingPlayer/player.cpp \
 	D:/QtProject/KingPlayer/player.h \
+	D:/QtProject/KingPlayer/rtmpwidget.cpp \
+	D:/QtProject/KingPlayer/rtmpwidget.h \
 	D:/QtProject/KingPlayer/tool.cpp \
 	D:/QtProject/KingPlayer/tool.h \
 	D:/QtProject/KingPlayer/mainwindow.ui \
+	D:/QtProject/KingPlayer/rtmpwidget.ui \
 	D:/Qt/Tools/CMake_64/bin/cmake.exe

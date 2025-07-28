@@ -41,6 +41,7 @@ public:
     QHBoxLayout *horizontalLayout;
     QToolButton *toolButton;
     QToolButton *toolButton_2;
+    QToolButton *toolButton_4;
     QSpacerItem *horizontalSpacer;
     QComboBox *speedComboBox;
     QToolButton *last_btn;
@@ -133,6 +134,16 @@ public:
 
         horizontalLayout->addWidget(toolButton_2);
 
+        toolButton_4 = new QToolButton(widget);
+        toolButton_4->setObjectName("toolButton_4");
+        toolButton_4->setStyleSheet(QString::fromUtf8("border:none;"));
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8(":/new/prefix1/image/rtmp.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        toolButton_4->setIcon(icon2);
+        toolButton_4->setIconSize(QSize(25, 25));
+
+        horizontalLayout->addWidget(toolButton_4);
+
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);
@@ -151,9 +162,9 @@ public:
         last_btn = new QToolButton(widget);
         last_btn->setObjectName("last_btn");
         last_btn->setStyleSheet(QString::fromUtf8("border:none;"));
-        QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/new/prefix1/image/last.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        last_btn->setIcon(icon2);
+        QIcon icon3;
+        icon3.addFile(QString::fromUtf8(":/new/prefix1/image/last.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        last_btn->setIcon(icon3);
         last_btn->setIconSize(QSize(20, 20));
 
         horizontalLayout->addWidget(last_btn);
@@ -161,9 +172,9 @@ public:
         start_btn = new QToolButton(widget);
         start_btn->setObjectName("start_btn");
         start_btn->setStyleSheet(QString::fromUtf8("border:none;"));
-        QIcon icon3;
-        icon3.addFile(QString::fromUtf8(":/new/prefix1/image/\346\222\255\346\224\276.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        start_btn->setIcon(icon3);
+        QIcon icon4;
+        icon4.addFile(QString::fromUtf8(":/new/prefix1/image/\346\222\255\346\224\276.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        start_btn->setIcon(icon4);
         start_btn->setIconSize(QSize(20, 20));
 
         horizontalLayout->addWidget(start_btn);
@@ -171,9 +182,9 @@ public:
         stop_btn = new QToolButton(widget);
         stop_btn->setObjectName("stop_btn");
         stop_btn->setStyleSheet(QString::fromUtf8("border:none;"));
-        QIcon icon4;
-        icon4.addFile(QString::fromUtf8(":/new/prefix1/image/\346\255\243\346\226\271\345\275\242.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        stop_btn->setIcon(icon4);
+        QIcon icon5;
+        icon5.addFile(QString::fromUtf8(":/new/prefix1/image/\346\255\243\346\226\271\345\275\242.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        stop_btn->setIcon(icon5);
         stop_btn->setIconSize(QSize(20, 20));
 
         horizontalLayout->addWidget(stop_btn);
@@ -181,9 +192,9 @@ public:
         next_btn = new QToolButton(widget);
         next_btn->setObjectName("next_btn");
         next_btn->setStyleSheet(QString::fromUtf8("border:none;"));
-        QIcon icon5;
-        icon5.addFile(QString::fromUtf8(":/new/prefix1/image/next.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        next_btn->setIcon(icon5);
+        QIcon icon6;
+        icon6.addFile(QString::fromUtf8(":/new/prefix1/image/next.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        next_btn->setIcon(icon6);
         next_btn->setIconSize(QSize(20, 20));
 
         horizontalLayout->addWidget(next_btn);
@@ -195,9 +206,9 @@ public:
         toolButton_3 = new QToolButton(widget);
         toolButton_3->setObjectName("toolButton_3");
         toolButton_3->setStyleSheet(QString::fromUtf8("border:none;"));
-        QIcon icon6;
-        icon6.addFile(QString::fromUtf8(":/new/prefix1/image/\351\237\263\351\207\217.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        toolButton_3->setIcon(icon6);
+        QIcon icon7;
+        icon7.addFile(QString::fromUtf8(":/new/prefix1/image/\351\237\263\351\207\217.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        toolButton_3->setIcon(icon7);
         toolButton_3->setIconSize(QSize(20, 20));
 
         horizontalLayout->addWidget(toolButton_3);
@@ -232,6 +243,7 @@ public:
         total_time->setText(QCoreApplication::translate("MainWindow", "00.00.00", nullptr));
         toolButton->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         toolButton_2->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
+        toolButton_4->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         speedComboBox->setItemText(0, QCoreApplication::translate("MainWindow", "2.0x", nullptr));
         speedComboBox->setItemText(1, QCoreApplication::translate("MainWindow", "1.5x", nullptr));
         speedComboBox->setItemText(2, QCoreApplication::translate("MainWindow", "1.25x", nullptr));

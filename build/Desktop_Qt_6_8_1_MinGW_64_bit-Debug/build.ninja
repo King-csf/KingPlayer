@@ -105,6 +105,14 @@ build CMakeFiles/KingPlayer.dir/tool.cpp.obj: CXX_COMPILER__KingPlayer_unscanned
   OBJECT_DIR = CMakeFiles\KingPlayer.dir
   OBJECT_FILE_DIR = CMakeFiles\KingPlayer.dir
 
+build CMakeFiles/KingPlayer.dir/rtmpwidget.cpp.obj: CXX_COMPILER__KingPlayer_unscanned_Debug D$:/QtProject/KingPlayer/rtmpwidget.cpp || cmake_object_order_depends_target_KingPlayer
+  DEFINES = -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
+  DEP_FILE = CMakeFiles\KingPlayer.dir\rtmpwidget.cpp.obj.d
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fdiagnostics-color=always
+  INCLUDES = -ID:/QtProject/KingPlayer/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KingPlayer_autogen/include -ID:/QtProject/KingPlayer/ffmpeg/include -ID:/QtProject/KingPlayer/SDL3/include -isystem D:/Qt/6.8.1/mingw_64/include/QtCore -isystem D:/Qt/6.8.1/mingw_64/include -isystem D:/Qt/6.8.1/mingw_64/mkspecs/win32-g++ -isystem D:/Qt/6.8.1/mingw_64/include/QtWidgets -isystem D:/Qt/6.8.1/mingw_64/include/QtGui
+  OBJECT_DIR = CMakeFiles\KingPlayer.dir
+  OBJECT_FILE_DIR = CMakeFiles\KingPlayer.dir
+
 build CMakeFiles/KingPlayer.dir/KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp.obj: CXX_COMPILER__KingPlayer_unscanned_Debug D$:/QtProject/KingPlayer/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp || cmake_object_order_depends_target_KingPlayer
   DEFINES = -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NEEDS_QMAIN -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
   DEP_FILE = CMakeFiles\KingPlayer.dir\KingPlayer_autogen\EWIEGA46WW\qrc_image.cpp.obj.d
@@ -121,7 +129,7 @@ build CMakeFiles/KingPlayer.dir/KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp.obj:
 #############################################
 # Link the executable KingPlayer.exe
 
-build KingPlayer.exe: CXX_EXECUTABLE_LINKER__KingPlayer_Debug CMakeFiles/KingPlayer.dir/KingPlayer_autogen/mocs_compilation.cpp.obj CMakeFiles/KingPlayer.dir/main.cpp.obj CMakeFiles/KingPlayer.dir/mainwindow.cpp.obj CMakeFiles/KingPlayer.dir/player.cpp.obj CMakeFiles/KingPlayer.dir/packetqueue.cpp.obj CMakeFiles/KingPlayer.dir/framequeue.cpp.obj CMakeFiles/KingPlayer.dir/tool.cpp.obj CMakeFiles/KingPlayer.dir/KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp.obj | D$:/Qt/6.8.1/mingw_64/lib/libQt6Widgets.a D$:/Qt/6.8.1/mingw_64/lib/libQt6Gui.a D$:/Qt/6.8.1/mingw_64/lib/libQt6Core.a D$:/Qt/6.8.1/mingw_64/lib/libQt6EntryPoint.a || KingPlayer_autogen KingPlayer_autogen_timestamp_deps
+build KingPlayer.exe: CXX_EXECUTABLE_LINKER__KingPlayer_Debug CMakeFiles/KingPlayer.dir/KingPlayer_autogen/mocs_compilation.cpp.obj CMakeFiles/KingPlayer.dir/main.cpp.obj CMakeFiles/KingPlayer.dir/mainwindow.cpp.obj CMakeFiles/KingPlayer.dir/player.cpp.obj CMakeFiles/KingPlayer.dir/packetqueue.cpp.obj CMakeFiles/KingPlayer.dir/framequeue.cpp.obj CMakeFiles/KingPlayer.dir/tool.cpp.obj CMakeFiles/KingPlayer.dir/rtmpwidget.cpp.obj CMakeFiles/KingPlayer.dir/KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp.obj | D$:/Qt/6.8.1/mingw_64/lib/libQt6Widgets.a D$:/Qt/6.8.1/mingw_64/lib/libQt6Gui.a D$:/Qt/6.8.1/mingw_64/lib/libQt6Core.a D$:/Qt/6.8.1/mingw_64/lib/libQt6EntryPoint.a || KingPlayer_autogen KingPlayer_autogen_timestamp_deps
   FLAGS = -DQT_QML_DEBUG -g
   LINK_FLAGS = -mwindows
   LINK_LIBRARIES = D:/Qt/6.8.1/mingw_64/lib/libQt6Widgets.a  -lavcodec  -lavformat  -lavutil  -lavfilter  -lswresample  -lswscale  -lSDL3  D:/Qt/6.8.1/mingw_64/lib/libQt6Gui.a  D:/Qt/6.8.1/mingw_64/lib/libQt6Core.a  -lmpr  -luserenv  -lmingw32  D:/Qt/6.8.1/mingw_64/lib/libQt6EntryPoint.a  -lshell32  -ld3d11  -ldxgi  -ldxguid  -ld3d12  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
@@ -209,7 +217,7 @@ build KingPlayer_autogen_timestamp_deps: phony
 #############################################
 # Utility command for KingPlayer_autogen
 
-build KingPlayer_autogen: phony CMakeFiles/KingPlayer_autogen KingPlayer_autogen/include/ui_mainwindow.h KingPlayer_autogen/timestamp KingPlayer_autogen/mocs_compilation.cpp KingPlayer_autogen_timestamp_deps
+build KingPlayer_autogen: phony CMakeFiles/KingPlayer_autogen KingPlayer_autogen/include/ui_mainwindow.h KingPlayer_autogen/include/ui_rtmpwidget.h KingPlayer_autogen/timestamp KingPlayer_autogen/mocs_compilation.cpp KingPlayer_autogen_timestamp_deps
 
 
 #############################################
@@ -226,7 +234,7 @@ build KingPlayer_autogen/timestamp KingPlayer_autogen/mocs_compilation.cpp | ${c
 #############################################
 # Custom command for KingPlayer_autogen\EWIEGA46WW\qrc_image.cpp
 
-build KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp | ${cmake_ninja_workdir}KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp: CUSTOM_COMMAND D$:/QtProject/KingPlayer/image.qrc CMakeFiles/KingPlayer_autogen.dir/AutoRcc_image_EWIEGA46WW_Info.json D$:/QtProject/KingPlayer/image/播放器.svg D$:/QtProject/KingPlayer/image/音量.png D$:/QtProject/KingPlayer/image/next.png D$:/QtProject/KingPlayer/image/暂停.png D$:/QtProject/KingPlayer/image/正方形.png D$:/QtProject/KingPlayer/image/last.png D$:/QtProject/KingPlayer/image/播放.png D$:/QtProject/KingPlayer/image/列表形式.png D$:/QtProject/KingPlayer/image/列表.png D$:/QtProject/KingPlayer/image/素材.png D$:/Qt/6.8.1/mingw_64/bin/rcc.exe D$:/Qt/6.8.1/mingw_64/bin/rcc.exe || KingPlayer_autogen KingPlayer_autogen_timestamp_deps
+build KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp | ${cmake_ninja_workdir}KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp: CUSTOM_COMMAND D$:/QtProject/KingPlayer/image.qrc CMakeFiles/KingPlayer_autogen.dir/AutoRcc_image_EWIEGA46WW_Info.json D$:/QtProject/KingPlayer/image/播放器.svg D$:/QtProject/KingPlayer/image/音量.png D$:/QtProject/KingPlayer/image/next.png D$:/QtProject/KingPlayer/image/暂停.png D$:/QtProject/KingPlayer/image/正方形.png D$:/QtProject/KingPlayer/image/last.png D$:/QtProject/KingPlayer/image/播放.png D$:/QtProject/KingPlayer/image/rtmp.png D$:/QtProject/KingPlayer/image/列表形式.png D$:/QtProject/KingPlayer/image/列表.png D$:/QtProject/KingPlayer/image/素材.png D$:/Qt/6.8.1/mingw_64/bin/rcc.exe D$:/Qt/6.8.1/mingw_64/bin/rcc.exe || KingPlayer_autogen KingPlayer_autogen_timestamp_deps
   COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D D:\QtProject\KingPlayer\build\Desktop_Qt_6_8_1_MinGW_64_bit-Debug && D:\Qt\Tools\CMake_64\bin\cmake.exe -E cmake_autorcc D:/QtProject/KingPlayer/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/CMakeFiles/KingPlayer_autogen.dir/AutoRcc_image_EWIEGA46WW_Info.json Debug"
   DESC = Automatic RCC for image.qrc
   restat = 1
@@ -235,7 +243,7 @@ build KingPlayer_autogen/EWIEGA46WW/qrc_image.cpp | ${cmake_ninja_workdir}KingPl
 #############################################
 # Phony custom command for CMakeFiles\KingPlayer_autogen
 
-build CMakeFiles/KingPlayer_autogen KingPlayer_autogen/include/ui_mainwindow.h | ${cmake_ninja_workdir}CMakeFiles/KingPlayer_autogen ${cmake_ninja_workdir}KingPlayer_autogen/include/ui_mainwindow.h: phony KingPlayer_autogen/timestamp || KingPlayer_autogen_timestamp_deps
+build CMakeFiles/KingPlayer_autogen KingPlayer_autogen/include/ui_mainwindow.h KingPlayer_autogen/include/ui_rtmpwidget.h | ${cmake_ninja_workdir}CMakeFiles/KingPlayer_autogen ${cmake_ninja_workdir}KingPlayer_autogen/include/ui_mainwindow.h ${cmake_ninja_workdir}KingPlayer_autogen/include/ui_rtmpwidget.h: phony KingPlayer_autogen/timestamp || KingPlayer_autogen_timestamp_deps
 
 # =============================================================================
 # Target aliases.

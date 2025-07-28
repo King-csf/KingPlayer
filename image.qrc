@@ -10,5 +10,6 @@
         <file>image/列表形式.png</file>
         <file>image/音量.png</file>
         <file>image/正方形.png</file>
+        <file>image/rtmp.png</file>
     </qresource>
 </RCC>
