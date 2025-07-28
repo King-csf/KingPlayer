@@ -34,7 +34,7 @@ public:
     ~MainWindow();
     void setSDLWindow();
     void showEvent(QShowEvent *event);
-    void resizeEvent(QResizeEvent * event);
+
 private slots:
     void on_toolButton_clicked();
 
@@ -49,6 +49,8 @@ private slots:
     void on_stop_btn_clicked();
 
     void on_start_btn_clicked();
+
+    void on_sound_bar_sliderPressed();
 
 private:
     Ui::MainWindow *ui;
@@ -68,6 +70,9 @@ private:
     void startThread();
     //初始化进度条
     void initProgressBar();
+    void initSoundBar();
+    int volume;
+
     QTimer *timer;  //定时器
     double curSec;     //当前进度条
     double totalTime; // 总进度

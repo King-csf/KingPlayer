@@ -31,7 +31,8 @@ Player::Player()
     stream = nullptr;
     totalTime = 0;
     av_log_set_level(AV_LOG_WARNING);
-
+    isModVolume.store(false);
+    volume.store(1.0);
 }
 
 Player::~Player()
@@ -538,7 +539,7 @@ void Player::delayVideo()
 
         // 告诉 SDL：我们的“逻辑坐标系”是 videoW x videoH
         SDL_SetRenderLogicalPresentation(render, viCodeCtx->width, viCodeCtx->height,SDL_LOGICAL_PRESENTATION_LETTERBOX);
-        qDebug() << "宽高比："  << sar.den << ":" << sar.num;
+
         SDL_RenderClear(render);
         SDL_RenderTexture(render,texture,NULL,NULL);
         SDL_RenderPresent(render);
@@ -678,6 +679,14 @@ void Player::playAudio()
             }
             isModSpeed = false;
         }
+
+        if(isModVolume.load())
+        {
+            initSpeedFilter();
+            qDebug() << "音量：" << volume;
+            isModVolume.store(false);
+        }
+
         if(isJumpInitFilter)
         {
             initSpeedFilter();
@@ -786,6 +795,11 @@ bool Player::initSpeedFilter()
         avfilter_free(speedFilter);
         speedFilter = nullptr;
     }
+    if(volumeFilter)
+    {
+        avfilter_free(volumeFilter);
+        volumeFilter = nullptr;
+    }
     if(graph)
     {
         avfilter_graph_free(&graph);
@@ -824,6 +838,15 @@ bool Player::initSpeedFilter()
         qDebug() << "sinkBuffer filter alloc failed";
         return false;
     }
+
+    QString volumeArg = QString("volume=%1").arg(volume.load());
+    ret = avfilter_graph_create_filter(&volumeFilter,avfilter_get_by_name("volume"),
+                                       "volume",volumeArg.toStdString().c_str(),nullptr,graph);
+    if(ret < 0)
+    {
+        qDebug() << "Failed to volumeFilter alloc";
+        return false;
+    }
     QString tempo = QString("tempo=%1").arg(speed);
     ret = avfilter_graph_create_filter(&speedFilter,avfilter_get_by_name("atempo"),
                                                "tempo",tempo.toStdString().c_str(),nullptr,graph);
@@ -834,7 +857,8 @@ bool Player::initSpeedFilter()
     }
 
     avfilter_link(srcBuffer, 0, speedFilter, 0);
-    avfilter_link(speedFilter, 0, sinkBuffer, 0);
+    avfilter_link(speedFilter, 0, volumeFilter, 0);
+    avfilter_link(volumeFilter,0,sinkBuffer,0);
 
     ret = avfilter_graph_config(graph,nullptr);
     if(ret < 0)
@@ -922,6 +946,11 @@ void Player::destory()
     {
         avfilter_free(speedFilter);
         speedFilter = nullptr;
+    }
+    if(volumeFilter)
+    {
+        avfilter_free(volumeFilter);
+        volumeFilter = nullptr;
     }
     qDebug() << "del speedFilter";
     if(graph)

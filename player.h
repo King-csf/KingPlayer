@@ -69,6 +69,7 @@ public:
     AVFilterContext * srcBuffer;
     AVFilterContext * sinkBuffer;
     AVFilterContext * speedFilter;
+    AVFilterContext * volumeFilter;
 
     enum threadType{
         THREAD_DEMUXER = 0,
@@ -110,6 +111,9 @@ public:
     std::atomic<bool> isJumpViDecode;
     std::atomic<bool> isPause;
     std::atomic<bool> isJumpInitFilter;
+
+    std::atomic<bool> isModVolume;
+    std::atomic<float> volume;
 };
 
 #endif // PLAYER_H

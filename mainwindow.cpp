@@ -19,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent)
     curSec = 0;
     ui->speedComboBox->setCurrentIndex(3);
     player->speed = 1;
+
+    initSoundBar();
 }
 
 void MainWindow::showEvent(QShowEvent *event)
@@ -342,8 +344,16 @@ void MainWindow::on_start_btn_clicked()
     });
 }
 
-
-void MainWindow::resizeEvent(QResizeEvent * event)
+void MainWindow::initSoundBar()
 {
-
+    volume = 50;
+    ui->sound_bar->setValue((int)volume);
 }
+
+void MainWindow::on_sound_bar_sliderPressed()
+{
+    int curVolume = ui->sound_bar->value();
+    player->isModVolume.store(true);
+    player->volume.store((float)curVolume/volume);
+}
+

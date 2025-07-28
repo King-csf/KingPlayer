@@ -279,7 +279,7 @@ border:3px solid #000000;
         </widget>
        </item>
        <item>
-        <widget class="QSlider" name="horizontalSlider_2">
+        <widget class="QSlider" name="sound_bar">
          <property name="orientation">
           <enum>Qt::Orientation::Horizontal</enum>
          </property>

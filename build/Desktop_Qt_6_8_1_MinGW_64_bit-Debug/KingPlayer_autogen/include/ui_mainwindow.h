@@ -49,7 +49,7 @@ public:
     QToolButton *next_btn;
     QSpacerItem *horizontalSpacer_2;
     QToolButton *toolButton_3;
-    QSlider *horizontalSlider_2;
+    QSlider *sound_bar;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -202,11 +202,11 @@ public:
 
         horizontalLayout->addWidget(toolButton_3);
 
-        horizontalSlider_2 = new QSlider(widget);
-        horizontalSlider_2->setObjectName("horizontalSlider_2");
-        horizontalSlider_2->setOrientation(Qt::Orientation::Horizontal);
+        sound_bar = new QSlider(widget);
+        sound_bar->setObjectName("sound_bar");
+        sound_bar->setOrientation(Qt::Orientation::Horizontal);
 
-        horizontalLayout->addWidget(horizontalSlider_2);
+        horizontalLayout->addWidget(sound_bar);
 
 
         verticalLayout->addWidget(widget);
