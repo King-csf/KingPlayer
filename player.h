@@ -37,6 +37,8 @@ public:
     SDL_Renderer * render;  //渲染器
     SDL_Texture * texture;  //纹理
 
+    AVRational sar; //视频宽高比
+
     PacketQueue audioPkt;   //音频pkt队列
     PacketQueue videoPkt;   //视频pkt队列
     FrameQueue  audioFrame;

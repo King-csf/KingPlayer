@@ -34,6 +34,7 @@ public:
     ~MainWindow();
     void setSDLWindow();
     void showEvent(QShowEvent *event);
+    void resizeEvent(QResizeEvent * event);
 private slots:
     void on_toolButton_clicked();
 

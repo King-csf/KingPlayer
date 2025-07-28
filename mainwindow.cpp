@@ -342,3 +342,8 @@ void MainWindow::on_start_btn_clicked()
     });
 }
 
+
+void MainWindow::resizeEvent(QResizeEvent * event)
+{
+
+}

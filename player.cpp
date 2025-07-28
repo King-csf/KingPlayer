@@ -65,6 +65,8 @@ int Player::demuxer(const QString& filename)
     vIdx = av_find_best_stream(inCtx,AVMEDIA_TYPE_VIDEO,-1,-1,NULL,0);
     aIdx = av_find_best_stream(inCtx,AVMEDIA_TYPE_AUDIO,-1,-1,NULL,0);
 
+    sar = inCtx->streams[vIdx]->sample_aspect_ratio;
+
     AVPacket pkt;
     int count = 0;
 
@@ -534,6 +536,9 @@ void Player::delayVideo()
         //          << frame->data[1]<< " " << frame->linesize[1] << " "
         //          << frame->data[2] << " "<< frame->linesize[3];
 
+        // 告诉 SDL：我们的“逻辑坐标系”是 videoW x videoH
+        SDL_SetRenderLogicalPresentation(render, viCodeCtx->width, viCodeCtx->height,SDL_LOGICAL_PRESENTATION_LETTERBOX);
+        qDebug() << "宽高比："  << sar.den << ":" << sar.num;
         SDL_RenderClear(render);
         SDL_RenderTexture(render,texture,NULL,NULL);
         SDL_RenderPresent(render);
